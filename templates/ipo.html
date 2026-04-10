@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>IPO — NepSera</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0e14;--surface:#111520;--surface2:#161c2a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#3d7fff;--accent2:#5b9bff;--green:#10c98a;--green-dim:rgba(16,201,138,0.12);--red:#f05252;--red-dim:rgba(240,82,82,0.12);--gold:#f5c542;--gold-dim:rgba(245,197,66,0.1);--text:#e8eaf0;--text2:#8890a4;--text3:#545e75;--radius:14px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.ticker-wrap{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;padding:8px 0;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;width:60px;height:100%;z-index:2;}
+.ticker-wrap::before{left:0;background:linear-gradient(to right,var(--surface),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(to left,var(--surface),transparent);}
+.ticker{display:flex;animation:ticker 30s linear infinite;width:max-content;}
+.ticker-item{display:flex;align-items:center;gap:6px;padding:0 28px;font-size:12px;font-weight:500;white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+.ticker-item .sym{color:var(--text2);}
+.ticker-sep{width:1px;height:14px;background:var(--border2);}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 40px;border-bottom:1px solid var(--border);background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.logo-area{display:flex;align-items:center;gap:14px;}
+.logo-img{height:70px;width:auto;object-fit:contain;filter:brightness(1.1);}
+.logo-text{display:flex;flex-direction:column;}
+.logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.5px;line-height:1;}
+.logo-tagline{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
+.ai-badge{display:flex;align-items:center;gap:5px;font-size:11px;background:rgba(61,127,255,0.12);color:var(--accent2);padding:4px 10px;border-radius:20px;font-weight:600;border:1px solid rgba(61,127,255,0.25);}
+.ai-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,127,255,0.6)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(61,127,255,0)}}
+.nav-links{display:flex;gap:4px;}
+.nav-link{font-size:13px;color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .2s;text-decoration:none;font-weight:500;}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.nav-link.active{color:var(--accent2);background:rgba(61,127,255,0.1);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.mkt-badge{font-size:11px;padding:4px 10px;border-radius:5px;font-weight:600;background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
+.btn-login{font-size:12px;font-weight:600;padding:7px 18px;border:1px solid var(--accent);border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);cursor:pointer;transition:all .2s;}
+.btn-login:hover{background:rgba(61,127,255,0.2);}
+.wrap{max-width:1280px;margin:0 auto;padding:32px 40px 60px;}
+.page-title{font-family:'DM Serif Display',serif;font-size:34px;color:var(--text);letter-spacing:-.5px;margin-bottom:6px;}
+.page-sub{font-size:14px;color:var(--text3);margin-bottom:32px;}
+.ipo-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+.ipo-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:22px;position:relative;overflow:hidden;transition:border-color .2s,transform .2s;}
+.ipo-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.ipo-status{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;margin-bottom:14px;}
+.status-open{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
+.status-open::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite;}
+.status-upcoming{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,197,66,0.2);}
+.status-closed{background:rgba(255,255,255,0.05);color:var(--text3);border:1px solid var(--border);}
+.ipo-company{font-family:'DM Serif Display',serif;font-size:18px;color:var(--text);margin-bottom:4px;line-height:1.2;}
+.ipo-sym{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text3);margin-bottom:14px;}
+.ipo-meta{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.ipo-meta-item{background:var(--surface2);border-radius:var(--radius-sm);padding:10px 12px;}
+.ipo-meta-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.ipo-meta-val{font-size:14px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.ipo-progress{margin-bottom:16px;}
+.ipo-prog-label{display:flex;justify-content:space-between;font-size:11px;color:var(--text3);margin-bottom:6px;}
+.prog-bar{height:6px;border-radius:3px;background:rgba(255,255,255,0.06);}
+.prog-fill{height:100%;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--green));}
+.ipo-btn{width:100%;padding:10px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all .2s;}
+.ipo-btn-apply{background:linear-gradient(135deg,var(--accent),#6c3fff);color:#fff;}
+.ipo-btn-apply:hover{opacity:.9;}
+.ipo-btn-remind{background:rgba(245,197,66,0.1);color:var(--gold);border:1px solid rgba(245,197,66,0.2);}
+.ipo-btn-remind:hover{background:rgba(245,197,66,0.18);}
+.ipo-btn-disabled{background:rgba(255,255,255,0.04);color:var(--text3);cursor:not-allowed;}
+.section-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);margin-bottom:16px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{font-size:10px;color:var(--text3);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px;}
+.tbl td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.04);}
+.tbl tr:hover td{background:rgba(255,255,255,0.025);}
+.tbl tr:last-child td{border-bottom:none;}
+.up{color:var(--green);}.dn{color:var(--red);}
+.ai-pick{display:flex;align-items:flex-start;gap:14px;padding:16px;background:rgba(61,127,255,0.06);border:1px solid rgba(61,127,255,0.15);border-radius:var(--radius-sm);margin-bottom:12px;}
+.ai-icon{width:36px;height:36px;border-radius:8px;background:linear-gradient(135deg,var(--accent),#6c3fff);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.ai-pick-title{font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.ai-pick-desc{font-size:12px;color:var(--text2);line-height:1.6;}
+.ai-pick-rating{font-size:11px;font-weight:700;color:var(--gold);margin-top:5px;}
+footer{background:var(--surface);border-top:1px solid var(--border);margin-top:60px;}
+.footer-bottom{max-width:1280px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-bottom-left{font-size:12px;color:var(--text3);}
+@media(max-width:900px){.ipo-grid{grid-template-columns:1fr;}.topbar{padding:10px 20px;}.wrap{padding:24px 20px 40px;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<div class="topbar">
+  <div class="logo-area">
+    <img src="logo1.png" alt="NepSera" class="logo-img">
+    <div class="logo-text">
+      <span class="logo-name">NepSera</span>
+      <span class="logo-tagline">Nepal Stock Intelligence</span>
+    </div>
+    <div class="ai-badge">AI-Powered</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="markets.html">Markets</a>
+    <a class="nav-link active" href="ipo.html">IPO</a>
+    <a class="nav-link" href="research.html">Research</a>
+    <a class="nav-link" href="learn.html">Learn</a>
+    <a class="nav-link" href="index.html">Dashboard</a>
+  </div>
+  <div class="topbar-right">
+    <div class="mkt-badge">● Market Open</div>
+    <button class="btn-login">Sign In</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-title">IPO Monitor</div>
+  <div class="page-sub">Track open, upcoming & recently closed IPOs · AI subscription ratings · Real-time allotment updates</div>
+
+  <div class="ipo-grid">
+    <!-- OPEN -->
+    <div class="ipo-card">
+      <div class="ipo-status status-open">● Open Now</div>
+      <div class="ipo-company">Gandaki Hydropower Ltd.</div>
+      <div class="ipo-sym">GHL · Hydropower</div>
+      <div class="ipo-meta">
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Issue Price</div><div class="ipo-meta-val">NPR 100</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Units</div><div class="ipo-meta-val">2,000,000</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Opens</div><div class="ipo-meta-val" style="font-size:12px;">Apr 8, 2025</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Closes</div><div class="ipo-meta-val" style="font-size:12px;">Apr 12, 2025</div></div>
+      </div>
+      <div class="ipo-progress">
+        <div class="ipo-prog-label"><span>Subscription</span><span style="color:var(--green);font-weight:700;">247%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:100%;"></div></div>
+      </div>
+      <button class="ipo-btn ipo-btn-apply">Apply via ASBA</button>
+    </div>
+
+    <!-- OPEN -->
+    <div class="ipo-card">
+      <div class="ipo-status status-open">● Open Now</div>
+      <div class="ipo-company">Sunrise Finance Ltd.</div>
+      <div class="ipo-sym">SFL · Finance</div>
+      <div class="ipo-meta">
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Issue Price</div><div class="ipo-meta-val">NPR 100</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Units</div><div class="ipo-meta-val">1,500,000</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Opens</div><div class="ipo-meta-val" style="font-size:12px;">Apr 9, 2025</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Closes</div><div class="ipo-meta-val" style="font-size:12px;">Apr 13, 2025</div></div>
+      </div>
+      <div class="ipo-progress">
+        <div class="ipo-prog-label"><span>Subscription</span><span style="color:var(--green);font-weight:700;">89%</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:89%;"></div></div>
+      </div>
+      <button class="ipo-btn ipo-btn-apply">Apply via ASBA</button>
+    </div>
+
+    <!-- UPCOMING -->
+    <div class="ipo-card">
+      <div class="ipo-status status-upcoming">⏳ Upcoming</div>
+      <div class="ipo-company">Himalayan Microfinance</div>
+      <div class="ipo-sym">HMF · Microfinance</div>
+      <div class="ipo-meta">
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Issue Price</div><div class="ipo-meta-val">NPR 100</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Units</div><div class="ipo-meta-val">800,000</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Opens</div><div class="ipo-meta-val" style="font-size:12px;">Apr 20, 2025</div></div>
+        <div class="ipo-meta-item"><div class="ipo-meta-label">Closes</div><div class="ipo-meta-val" style="font-size:12px;">Apr 24, 2025</div></div>
+      </div>
+      <div class="ipo-progress">
+        <div class="ipo-prog-label"><span>Not yet open</span><span style="color:var(--text3);">—</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:0%;"></div></div>
+      </div>
+      <button class="ipo-btn ipo-btn-remind">🔔 Set Reminder</button>
+    </div>
+  </div>
+
+  <!-- AI RATINGS -->
+  <div class="section-title">AI Subscription Ratings</div>
+  <div class="card" style="margin-bottom:28px;">
+    <div class="card-title">NepSera AI Analysis</div>
+    <div class="ai-pick">
+      <div class="ai-icon">🤖</div>
+      <div>
+        <div class="ai-pick-title">Gandaki Hydropower Ltd. (GHL)</div>
+        <div class="ai-pick-desc">Strong fundamentals with a 42MW installed capacity. Located in Gandaki Province with stable water flow data. Project debt-equity ratio is within SEBON guidelines. Expected listing premium based on comparable hydropower IPOs: 30–50%.</div>
+        <div class="ai-pick-rating">★★★★☆ &nbsp;AI Rating: 4.1 / 5 &nbsp;· &nbsp;Recommended: Subscribe</div>
+      </div>
+    </div>
+    <div class="ai-pick">
+      <div class="ai-icon">🤖</div>
+      <div>
+        <div class="ai-pick-title">Sunrise Finance Ltd. (SFL)</div>
+        <div class="ai-pick-desc">Finance sector IPO with moderate interest. Below-average subscription pace suggests lower demand. Revenue growth in last 2 fiscal years is positive but EPS remains thin at NPR 8.2. Listing premium expected to be modest.</div>
+        <div class="ai-pick-rating">★★★☆☆ &nbsp;AI Rating: 2.9 / 5 &nbsp;· &nbsp;Neutral: Apply with caution</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RECENTLY CLOSED -->
+  <div class="section-title">Recently Closed IPOs</div>
+  <div class="card">
+    <div class="card-title">Allotment & Listing Results</div>
+    <table class="tbl"><thead><tr><th>Company</th><th>Symbol</th><th>Issue Price</th><th>Listing Price</th><th>Listing Return</th><th>Allotment Date</th><th>Status</th></tr></thead><tbody>
+      <tr><td style="font-weight:600;">Koshi Hydropower</td><td style="font-family:'JetBrains Mono',monospace;font-weight:700;">KHP</td><td style="font-family:'JetBrains Mono',monospace;">NPR 100</td><td style="font-family:'JetBrains Mono',monospace;">NPR 168</td><td class="up" style="font-weight:700;">+68%</td><td style="color:var(--text3);font-size:12px;">Mar 28, 2025</td><td><span style="font-size:11px;background:var(--green-dim);color:var(--green);padding:3px 8px;border-radius:5px;font-weight:600;">Listed</span></td></tr>
+      <tr><td style="font-weight:600;">Nepal Reinsurance</td><td style="font-family:'JetBrains Mono',monospace;font-weight:700;">NRIC</td><td style="font-family:'JetBrains Mono',monospace;">NPR 100</td><td style="font-family:'JetBrains Mono',monospace;">NPR 142</td><td class="up" style="font-weight:700;">+42%</td><td style="color:var(--text3);font-size:12px;">Mar 14, 2025</td><td><span style="font-size:11px;background:var(--green-dim);color:var(--green);padding:3px 8px;border-radius:5px;font-weight:600;">Listed</span></td></tr>
+      <tr><td style="font-weight:600;">Bagmati Laghubitta</td><td style="font-family:'JetBrains Mono',monospace;font-weight:700;">BMLB</td><td style="font-family:'JetBrains Mono',monospace;">NPR 100</td><td style="font-family:'JetBrains Mono',monospace;">NPR 118</td><td class="up" style="font-weight:700;">+18%</td><td style="color:var(--text3);font-size:12px;">Feb 22, 2025</td><td><span style="font-size:11px;background:var(--green-dim);color:var(--green);padding:3px 8px;border-radius:5px;font-weight:600;">Listed</span></td></tr>
+      <tr><td style="font-weight:600;">Seti Hydropower</td><td style="font-family:'JetBrains Mono',monospace;font-weight:700;">SHYD</td><td style="font-family:'JetBrains Mono',monospace;">NPR 100</td><td style="font-family:'JetBrains Mono',monospace;">—</td><td style="color:var(--text3);">Pending</td><td style="color:var(--text3);font-size:12px;">Apr 15, 2025</td><td><span style="font-size:11px;background:var(--gold-dim);color:var(--gold);padding:3px 8px;border-radius:5px;font-weight:600;">Allotment Soon</span></td></tr>
+    </tbody></table>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="footer-bottom-left">© 2025 NepSera Technologies Pvt. Ltd. · IPO data sourced from SEBON & company prospectuses.</div>
+    <div style="font-size:12px;color:var(--text3);">Data Partners: NEPSE · SEBON · NRB</div>
+  </div>
+</footer>
+
+<script>
+const tickerData=[{sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},{sym:'NICA',val:'920',chg:'+1.32%',up:true},{sym:'BPCL',val:'595',chg:'+7.40%',up:true},{sym:'UPPER',val:'224',chg:'+9.80%',up:true},{sym:'SHPC',val:'388',chg:'-2.02%',up:false},{sym:'LICN',val:'1,197',chg:'-5.80%',up:false}];
+const t=document.getElementById('ticker');
+const items=tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span style="color:var(--text)">${d.val}</span><span style="color:${d.up?'var(--green)':'var(--red)'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
+t.innerHTML=items+items;
+</script>
+</body>
+</html>

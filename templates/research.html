@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Research — NepSera</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#0b0e14;--surface:#111520;--surface2:#161c2a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#3d7fff;--accent2:#5b9bff;--green:#10c98a;--green-dim:rgba(16,201,138,0.12);--red:#f05252;--red-dim:rgba(240,82,82,0.12);--gold:#f5c542;--text:#e8eaf0;--text2:#8890a4;--text3:#545e75;--radius:14px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.ticker-wrap{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;padding:8px 0;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;width:60px;height:100%;z-index:2;}
+.ticker-wrap::before{left:0;background:linear-gradient(to right,var(--surface),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(to left,var(--surface),transparent);}
+.ticker{display:flex;animation:ticker 30s linear infinite;width:max-content;}
+.ticker-item{display:flex;align-items:center;gap:6px;padding:0 28px;font-size:12px;font-weight:500;white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+.ticker-item .sym{color:var(--text2);}
+.ticker-sep{width:1px;height:14px;background:var(--border2);}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 40px;border-bottom:1px solid var(--border);background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.logo-area{display:flex;align-items:center;gap:14px;}
+.logo-img{height:70px;width:auto;object-fit:contain;filter:brightness(1.1);}
+.logo-text{display:flex;flex-direction:column;}
+.logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.5px;line-height:1;}
+.logo-tagline{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
+.ai-badge{display:flex;align-items:center;gap:5px;font-size:11px;background:rgba(61,127,255,0.12);color:var(--accent2);padding:4px 10px;border-radius:20px;font-weight:600;border:1px solid rgba(61,127,255,0.25);}
+.ai-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,127,255,0.6)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(61,127,255,0)}}
+.nav-links{display:flex;gap:4px;}
+.nav-link{font-size:13px;color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .2s;text-decoration:none;font-weight:500;}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.nav-link.active{color:var(--accent2);background:rgba(61,127,255,0.1);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.mkt-badge{font-size:11px;padding:4px 10px;border-radius:5px;font-weight:600;background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
+.btn-login{font-size:12px;font-weight:600;padding:7px 18px;border:1px solid var(--accent);border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);cursor:pointer;transition:all .2s;}
+.btn-login:hover{background:rgba(61,127,255,0.2);}
+.wrap{max-width:1280px;margin:0 auto;padding:32px 40px 60px;}
+.page-title{font-family:'DM Serif Display',serif;font-size:34px;margin-bottom:6px;}
+.page-sub{font-size:14px;color:var(--text3);margin-bottom:32px;}
+.g2{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:20px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;}
+.report-item{display:flex;gap:16px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,0.04);align-items:flex-start;}
+.report-item:last-child{border-bottom:none;}
+.report-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.ri-blue{background:rgba(61,127,255,0.12);border:1px solid rgba(61,127,255,0.2);}
+.ri-green{background:var(--green-dim);border:1px solid rgba(16,201,138,0.2);}
+.ri-gold{background:rgba(245,197,66,0.1);border:1px solid rgba(245,197,66,0.2);}
+.ri-red{background:var(--red-dim);border:1px solid rgba(240,82,82,0.2);}
+.report-title{font-size:14px;font-weight:600;color:var(--text);margin-bottom:5px;line-height:1.3;}
+.report-meta{font-size:11px;color:var(--text3);display:flex;gap:12px;margin-bottom:7px;}
+.report-tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:4px;font-weight:600;margin-right:5px;}
+.tag-buy{background:var(--green-dim);color:var(--green);}
+.tag-sell{background:var(--red-dim);color:var(--red);}
+.tag-hold{background:rgba(245,197,66,0.1);color:var(--gold);}
+.tag-sector{background:rgba(61,127,255,0.1);color:var(--accent2);}
+.report-excerpt{font-size:12px;color:var(--text2);line-height:1.65;}
+.report-cta{font-size:12px;color:var(--accent2);font-weight:600;margin-top:8px;cursor:pointer;display:inline-flex;align-items:center;gap:4px;}
+.report-cta:hover{text-decoration:underline;}
+.filter-bar{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap;}
+.filter-btn{font-size:12px;padding:6px 16px;border:1px solid var(--border2);border-radius:20px;background:transparent;color:var(--text2);cursor:pointer;transition:all .2s;font-weight:500;}
+.filter-btn.active,.filter-btn:hover{border-color:var(--accent);color:var(--accent2);background:rgba(61,127,255,0.08);}
+.sidebar-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;margin-bottom:16px;}
+.sc-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:14px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;}
+.sc-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;}
+.valuation-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);font-size:13px;}
+.valuation-row:last-child{border-bottom:none;}
+.vr-label{color:var(--text2);}
+.vr-val{font-family:'JetBrains Mono',monospace;font-weight:600;}
+.consensus-item{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.consensus-item:last-child{border-bottom:none;}
+.ci-sym{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:13px;}
+.ci-tp{font-size:12px;color:var(--text2);}
+.upside{font-size:12px;font-weight:700;color:var(--green);}
+.chart-wrap{height:180px;margin-top:8px;}
+footer{background:var(--surface);border-top:1px solid var(--border);margin-top:60px;}
+.footer-bottom{max-width:1280px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-bottom-left{font-size:12px;color:var(--text3);}
+@media(max-width:900px){.g2{grid-template-columns:1fr;}.topbar{padding:10px 20px;}.wrap{padding:24px 20px 40px;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<div class="topbar">
+  <div class="logo-area">
+    <img src="logo1.png" alt="NepSera" class="logo-img">
+    <div class="logo-text">
+      <span class="logo-name">NepSera</span>
+      <span class="logo-tagline">Nepal Stock Intelligence</span>
+    </div>
+    <div class="ai-badge">AI-Powered</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="markets.html">Markets</a>
+    <a class="nav-link" href="ipo.html">IPO</a>
+    <a class="nav-link active" href="research.html">Research</a>
+    <a class="nav-link" href="learn.html">Learn</a>
+    <a class="nav-link" href="index.html">Dashboard</a>
+  </div>
+  <div class="topbar-right">
+    <div class="mkt-badge">● Market Open</div>
+    <button class="btn-login">Sign In</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-title">Research</div>
+  <div class="page-sub">AI-generated reports · Sector analysis · Valuation models · Analyst consensus</div>
+
+  <div class="g2">
+    <div>
+      <div class="filter-bar">
+        <button class="filter-btn active">All Reports</button>
+        <button class="filter-btn">Banking</button>
+        <button class="filter-btn">Hydropower</button>
+        <button class="filter-btn">Insurance</button>
+        <button class="filter-btn">Finance</button>
+        <button class="filter-btn">Macro</button>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Latest Research Reports</div>
+
+        <div class="report-item">
+          <div class="report-icon ri-blue">🏦</div>
+          <div>
+            <div class="report-title">NABIL Bank — Q3 FY2025 Earnings Deep Dive</div>
+            <div class="report-meta"><span>Apr 9, 2025</span><span>·</span><span>NepSera AI Research</span></div>
+            <div><span class="report-tag tag-buy">BUY</span><span class="report-tag tag-sector">Banking</span></div>
+            <div class="report-excerpt">Net interest income grew 14.2% YoY driven by strong loan book expansion. NPL ratio improved to 1.8% from 2.4% in Q2. Target price revised upward to NPR 1,580 on back of NRB rate corridor easing and improving credit demand.</div>
+            <div class="report-cta">Read full report →</div>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div class="report-icon ri-green">⚡</div>
+          <div>
+            <div class="report-title">Hydropower Sector Outlook — Monsoon 2025 Preview</div>
+            <div class="report-meta"><span>Apr 7, 2025</span><span>·</span><span>NepSera AI Research</span></div>
+            <div><span class="report-tag tag-buy">OVERWEIGHT</span><span class="report-tag tag-sector">Hydropower</span></div>
+            <div class="report-excerpt">Pre-monsoon water levels in Koshi and Gandaki basins are tracking 18% above 5-year average. Peak generation season expected to begin mid-June. Upper Tamakoshi, BPCL, and NHPC are best positioned heading into Q4.</div>
+            <div class="report-cta">Read full report →</div>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div class="report-icon ri-red">🛡️</div>
+          <div>
+            <div class="report-title">Life Insurance Sector — Rising Claims Pressure Persists</div>
+            <div class="report-meta"><span>Apr 5, 2025</span><span>·</span><span>NepSera AI Research</span></div>
+            <div><span class="report-tag tag-sell">UNDERWEIGHT</span><span class="report-tag tag-sector">Insurance</span></div>
+            <div class="report-excerpt">Claim ratios across life insurers climbed to an average 68% in Q3 FY2025, up from 59% a year ago. Premium income growth of 8.4% is failing to offset rising payouts. LICN and NLICL face the most pressure; non-life insurers look more resilient.</div>
+            <div class="report-cta">Read full report →</div>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div class="report-icon ri-gold">📊</div>
+          <div>
+            <div class="report-title">NEPSE Macro Note — NRB April Policy Impact</div>
+            <div class="report-meta"><span>Apr 3, 2025</span><span>·</span><span>NepSera AI Research</span></div>
+            <div><span class="report-tag tag-hold">NEUTRAL</span><span class="report-tag tag-sector">Macro</span></div>
+            <div class="report-excerpt">Nepal Rastra Bank's corridor rate cut of 50bps is a net positive for the equity market. Lower cost of funds benefits banks and BFIs directly. Equity market multiple expansion of 5–8% is plausible over the next two quarters if credit growth accelerates.</div>
+            <div class="report-cta">Read full report →</div>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div class="report-icon ri-blue">🏢</div>
+          <div>
+            <div class="report-title">NIC Asia Bank — Initiating Coverage at BUY</div>
+            <div class="report-meta"><span>Apr 1, 2025</span><span>·</span><span>NepSera AI Research</span></div>
+            <div><span class="report-tag tag-buy">BUY</span><span class="report-tag tag-sector">Banking</span></div>
+            <div class="report-excerpt">Initiating coverage with a 12-month target price of NPR 1,080. NICA offers the best risk-adjusted return in the banking sector. Strong digital banking rollout, improving CASA ratio of 38%, and healthy capital adequacy ratio of 12.4% underpin the thesis.</div>
+            <div class="report-cta">Read full report →</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="sidebar-card">
+        <div class="sc-title">NABIL Valuation</div>
+        <div class="chart-wrap"><canvas id="valChart"></canvas></div>
+        <div style="margin-top:14px;">
+          <div class="valuation-row"><span class="vr-label">Current Price</span><span class="vr-val">NPR 1,363</span></div>
+          <div class="valuation-row"><span class="vr-label">Target Price</span><span class="vr-val" style="color:var(--green);">NPR 1,580</span></div>
+          <div class="valuation-row"><span class="vr-label">Upside</span><span class="vr-val" style="color:var(--green);">+15.9%</span></div>
+          <div class="valuation-row"><span class="vr-label">P/E Ratio</span><span class="vr-val">18.4x</span></div>
+          <div class="valuation-row"><span class="vr-label">EPS (TTM)</span><span class="vr-val">NPR 74.1</span></div>
+          <div class="valuation-row"><span class="vr-label">Book Value</span><span class="vr-val">NPR 1,180</span></div>
+        </div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sc-title">Analyst Consensus</div>
+        <div class="consensus-item"><div><div class="ci-sym">NABIL</div><div class="ci-tp">TP: NPR 1,580</div></div><div class="upside">↑ +15.9%</div></div>
+        <div class="consensus-item"><div><div class="ci-sym">NICA</div><div class="ci-tp">TP: NPR 1,080</div></div><div class="upside">↑ +17.4%</div></div>
+        <div class="consensus-item"><div><div class="ci-sym">BPCL</div><div class="ci-tp">TP: NPR 680</div></div><div class="upside">↑ +14.3%</div></div>
+        <div class="consensus-item"><div><div class="ci-sym">UPPER</div><div class="ci-tp">TP: NPR 260</div></div><div class="upside">↑ +16.1%</div></div>
+        <div class="consensus-item"><div><div class="ci-sym">LICN</div><div class="ci-tp">TP: NPR 1,050</div></div><div style="font-size:12px;font-weight:700;color:var(--red);">↓ -12.3%</div></div>
+      </div>
+
+      <div class="sidebar-card">
+        <div class="sc-title">Sector Ratings</div>
+        <div class="consensus-item"><span style="font-size:13px;font-weight:600;">Banking</span><span style="font-size:11px;padding:3px 10px;border-radius:5px;font-weight:700;background:var(--green-dim);color:var(--green);">Overweight</span></div>
+        <div class="consensus-item"><span style="font-size:13px;font-weight:600;">Hydropower</span><span style="font-size:11px;padding:3px 10px;border-radius:5px;font-weight:700;background:var(--green-dim);color:var(--green);">Overweight</span></div>
+        <div class="consensus-item"><span style="font-size:13px;font-weight:600;">Insurance</span><span style="font-size:11px;padding:3px 10px;border-radius:5px;font-weight:700;background:var(--red-dim);color:var(--red);">Underweight</span></div>
+        <div class="consensus-item"><span style="font-size:13px;font-weight:600;">Finance</span><span style="font-size:11px;padding:3px 10px;border-radius:5px;font-weight:700;background:rgba(245,197,66,0.1);color:var(--gold);">Neutral</span></div>
+        <div class="consensus-item" style="border:none;"><span style="font-size:13px;font-weight:600;">Manufacturing</span><span style="font-size:11px;padding:3px 10px;border-radius:5px;font-weight:700;background:rgba(245,197,66,0.1);color:var(--gold);">Neutral</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="footer-bottom-left">© 2025 NepSera Technologies Pvt. Ltd. · Research is AI-generated for informational purposes only. Not financial advice.</div>
+    <div style="font-size:12px;color:var(--text3);">Data Partners: NEPSE · SEBON · NRB</div>
+  </div>
+</footer>
+
+<script>
+const tickerData=[{sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},{sym:'NICA',val:'920',chg:'+1.32%',up:true},{sym:'BPCL',val:'595',chg:'+7.40%',up:true},{sym:'UPPER',val:'224',chg:'+9.80%',up:true},{sym:'SHPC',val:'388',chg:'-2.02%',up:false},{sym:'LICN',val:'1,197',chg:'-5.80%',up:false}];
+const t=document.getElementById('ticker');
+const items=tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span style="color:var(--text)">${d.val}</span><span style="color:${d.up?'var(--green)':'var(--red)'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
+t.innerHTML=items+items;
+Chart.defaults.color='#8890a4';Chart.defaults.font={family:"'DM Sans',sans-serif",size:11};
+const qLabels=['Q4 FY23','Q1 FY24','Q2 FY24','Q3 FY24','Q4 FY24','Q1 FY25','Q2 FY25','Q3 FY25'];
+const eps=[58,62,65,69,71,73,70,74];
+new Chart(document.getElementById('valChart'),{type:'bar',data:{labels:qLabels,datasets:[{data:eps,backgroundColor:'rgba(61,127,255,0.5)',borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:8,callbacks:{label:ctx=>'EPS: NPR '+ctx.raw}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{callback:v=>'₨'+v}}}}});
+</script>
+</body>
+</html>

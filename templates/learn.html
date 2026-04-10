@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Learn — NepSera</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0b0e14;--surface:#111520;--surface2:#161c2a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#3d7fff;--accent2:#5b9bff;--green:#10c98a;--green-dim:rgba(16,201,138,0.12);--red:#f05252;--red-dim:rgba(240,82,82,0.12);--gold:#f5c542;--text:#e8eaf0;--text2:#8890a4;--text3:#545e75;--radius:14px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.ticker-wrap{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;padding:8px 0;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;width:60px;height:100%;z-index:2;}
+.ticker-wrap::before{left:0;background:linear-gradient(to right,var(--surface),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(to left,var(--surface),transparent);}
+.ticker{display:flex;animation:ticker 30s linear infinite;width:max-content;}
+.ticker-item{display:flex;align-items:center;gap:6px;padding:0 28px;font-size:12px;font-weight:500;white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+.ticker-item .sym{color:var(--text2);}
+.ticker-sep{width:1px;height:14px;background:var(--border2);}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 40px;border-bottom:1px solid var(--border);background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.logo-area{display:flex;align-items:center;gap:14px;}
+.logo-img{height:70px;width:auto;object-fit:contain;filter:brightness(1.1);}
+.logo-text{display:flex;flex-direction:column;}
+.logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.5px;line-height:1;}
+.logo-tagline{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
+.ai-badge{display:flex;align-items:center;gap:5px;font-size:11px;background:rgba(61,127,255,0.12);color:var(--accent2);padding:4px 10px;border-radius:20px;font-weight:600;border:1px solid rgba(61,127,255,0.25);}
+.ai-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,127,255,0.6)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(61,127,255,0)}}
+.nav-links{display:flex;gap:4px;}
+.nav-link{font-size:13px;color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .2s;text-decoration:none;font-weight:500;}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.nav-link.active{color:var(--accent2);background:rgba(61,127,255,0.1);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.mkt-badge{font-size:11px;padding:4px 10px;border-radius:5px;font-weight:600;background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
+.btn-login{font-size:12px;font-weight:600;padding:7px 18px;border:1px solid var(--accent);border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);cursor:pointer;transition:all .2s;}
+.btn-login:hover{background:rgba(61,127,255,0.2);}
+.wrap{max-width:1280px;margin:0 auto;padding:32px 40px 60px;}
+.page-title{font-family:'DM Serif Display',serif;font-size:34px;margin-bottom:6px;}
+.page-sub{font-size:14px;color:var(--text3);margin-bottom:36px;}
+
+/* HERO TRACKS */
+.tracks{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;}
+.track-card{border-radius:var(--radius);padding:24px;position:relative;overflow:hidden;cursor:pointer;transition:transform .2s;border:1px solid transparent;}
+.track-card:hover{transform:translateY(-3px);}
+.tc-beginner{background:linear-gradient(135deg,rgba(16,201,138,0.15),rgba(16,201,138,0.05));border-color:rgba(16,201,138,0.2);}
+.tc-intermediate{background:linear-gradient(135deg,rgba(61,127,255,0.15),rgba(61,127,255,0.05));border-color:rgba(61,127,255,0.2);}
+.tc-advanced{background:linear-gradient(135deg,rgba(245,197,66,0.12),rgba(245,197,66,0.04));border-color:rgba(245,197,66,0.2);}
+.track-emoji{font-size:32px;margin-bottom:12px;}
+.track-level{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+.tl-b{color:var(--green);}.tl-i{color:var(--accent2);}.tl-a{color:var(--gold);}
+.track-name{font-family:'DM Serif Display',serif;font-size:20px;margin-bottom:8px;}
+.track-desc{font-size:13px;color:var(--text2);line-height:1.65;margin-bottom:14px;}
+.track-meta{display:flex;gap:14px;font-size:12px;color:var(--text3);}
+.track-btn{display:inline-block;margin-top:14px;font-size:12px;font-weight:700;padding:8px 18px;border-radius:20px;cursor:pointer;border:none;}
+.tb-b{background:var(--green-dim);color:var(--green);}
+.tb-i{background:rgba(61,127,255,0.12);color:var(--accent2);}
+.tb-a{background:rgba(245,197,66,0.1);color:var(--gold);}
+
+.section-title{font-family:'DM Serif Display',serif;font-size:22px;margin-bottom:18px;}
+.articles-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:40px;}
+.article-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;cursor:pointer;transition:all .2s;}
+.article-card:hover{border-color:var(--border2);transform:translateY(-2px);}
+.article-cat{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;margin-bottom:10px;}
+.ac-basics{color:var(--green);}.ac-technical{color:var(--accent2);}.ac-fundamental{color:var(--gold);}.ac-nepse{color:var(--red);}
+.article-title{font-size:14px;font-weight:600;color:var(--text);line-height:1.45;margin-bottom:8px;}
+.article-excerpt{font-size:12px;color:var(--text2);line-height:1.65;margin-bottom:12px;}
+.article-meta{font-size:11px;color:var(--text3);display:flex;gap:10px;align-items:center;}
+.read-time{background:rgba(255,255,255,0.05);padding:2px 8px;border-radius:4px;}
+
+.glossary-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:40px;}
+.glossary-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);padding:16px 18px;}
+.g-term{font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:700;color:var(--accent2);margin-bottom:6px;}
+.g-def{font-size:13px;color:var(--text2);line-height:1.65;}
+
+.faq-item{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-sm);margin-bottom:8px;overflow:hidden;}
+.faq-q{padding:16px 18px;font-size:14px;font-weight:600;cursor:pointer;display:flex;justify-content:space-between;align-items:center;transition:background .2s;}
+.faq-q:hover{background:rgba(255,255,255,0.025);}
+.faq-arrow{color:var(--text3);transition:transform .2s;font-size:12px;}
+.faq-a{display:none;padding:0 18px 16px;font-size:13px;color:var(--text2);line-height:1.75;border-top:1px solid var(--border);}
+.faq-item.open .faq-a{display:block;padding-top:14px;}
+.faq-item.open .faq-arrow{transform:rotate(180deg);}
+
+footer{background:var(--surface);border-top:1px solid var(--border);margin-top:60px;}
+.footer-bottom{max-width:1280px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-bottom-left{font-size:12px;color:var(--text3);}
+@media(max-width:900px){.tracks,.articles-grid,.glossary-grid{grid-template-columns:1fr;}.topbar{padding:10px 20px;}.wrap{padding:24px 20px 40px;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<div class="topbar">
+  <div class="logo-area">
+    <img src="logo1.png" alt="NepSera" class="logo-img">
+    <div class="logo-text">
+      <span class="logo-name">NepSera</span>
+      <span class="logo-tagline">Nepal Stock Intelligence</span>
+    </div>
+    <div class="ai-badge">AI-Powered</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link" href="markets.html">Markets</a>
+    <a class="nav-link" href="ipo.html">IPO</a>
+    <a class="nav-link" href="research.html">Research</a>
+    <a class="nav-link active" href="learn.html">Learn</a>
+    <a class="nav-link" href="index.html">Dashboard</a>
+  </div>
+  <div class="topbar-right">
+    <div class="mkt-badge">● Market Open</div>
+    <button class="btn-login">Sign In</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-title">Learn Investing</div>
+  <div class="page-sub">From zero to confident investor — guides, glossary & NEPSE-specific education built for Nepali investors</div>
+
+  <!-- LEARNING TRACKS -->
+  <div class="section-title">Learning Tracks</div>
+  <div class="tracks">
+    <div class="track-card tc-beginner">
+      <div class="track-emoji">🌱</div>
+      <div class="track-level tl-b">Beginner</div>
+      <div class="track-name">Stock Market Basics</div>
+      <div class="track-desc">Understand what stocks are, how NEPSE works, how to open a DEMAT account, and make your first investment with confidence.</div>
+      <div class="track-meta"><span>📚 8 lessons</span><span>⏱ ~2 hours</span></div>
+      <button class="track-btn tb-b">Start Learning →</button>
+    </div>
+    <div class="track-card tc-intermediate">
+      <div class="track-emoji">📈</div>
+      <div class="track-level tl-i">Intermediate</div>
+      <div class="track-name">Reading Charts & Data</div>
+      <div class="track-desc">Master candlestick charts, moving averages, RSI, MACD and volume analysis to make smarter entry and exit decisions.</div>
+      <div class="track-meta"><span>📚 12 lessons</span><span>⏱ ~4 hours</span></div>
+      <button class="track-btn tb-i">Continue →</button>
+    </div>
+    <div class="track-card tc-advanced">
+      <div class="track-emoji">🏆</div>
+      <div class="track-level tl-a">Advanced</div>
+      <div class="track-name">Fundamental Analysis</div>
+      <div class="track-desc">Dig into financial statements, calculate intrinsic value, analyze EPS growth, book value, and build a conviction-based portfolio.</div>
+      <div class="track-meta"><span>📚 15 lessons</span><span>⏱ ~6 hours</span></div>
+      <button class="track-btn tb-a">Explore →</button>
+    </div>
+  </div>
+
+  <!-- ARTICLES -->
+  <div class="section-title">Featured Articles</div>
+  <div class="articles-grid">
+    <div class="article-card">
+      <div class="article-cat ac-basics">Basics</div>
+      <div class="article-title">How to Open a DEMAT Account in Nepal — Step by Step</div>
+      <div class="article-excerpt">Everything you need to open a DEMAT account with CDSC Nepal, including documents required, broker selection, and CRN linking via MeroShare.</div>
+      <div class="article-meta"><span>Apr 2, 2025</span><span class="read-time">5 min read</span></div>
+    </div>
+    <div class="article-card">
+      <div class="article-cat ac-technical">Technical</div>
+      <div class="article-title">How to Read Candlestick Charts for NEPSE Stocks</div>
+      <div class="article-excerpt">Learn to interpret bullish engulfing, doji, hammer, and shooting star patterns using real NEPSE stock examples from NABIL and UPPER.</div>
+      <div class="article-meta"><span>Mar 28, 2025</span><span class="read-time">8 min read</span></div>
+    </div>
+    <div class="article-card">
+      <div class="article-cat ac-nepse">NEPSE Guide</div>
+      <div class="article-title">Understanding NEPSE Circuit Breakers and Trading Halts</div>
+      <div class="article-excerpt">When and why does NEPSE halt trading? What happens to your orders? Learn the 4%, 5%, and 10% circuit rules and what to do when they trigger.</div>
+      <div class="article-meta"><span>Mar 22, 2025</span><span class="read-time">6 min read</span></div>
+    </div>
+    <div class="article-card">
+      <div class="article-cat ac-fundamental">Fundamental</div>
+      <div class="article-title">How to Analyze a Bank's Annual Report — Nepal Edition</div>
+      <div class="article-excerpt">A practical walkthrough of reading NRB-regulated bank financials: Net Interest Margin, NPL ratio, CAR, CASA ratio, and what each means for investors.</div>
+      <div class="article-meta"><span>Mar 18, 2025</span><span class="read-time">10 min read</span></div>
+    </div>
+    <div class="article-card">
+      <div class="article-cat ac-basics">Basics</div>
+      <div class="article-title">Bonus Shares vs Rights Shares — What's the Difference?</div>
+      <div class="article-excerpt">Two of the most confusing terms for new NEPSE investors explained clearly: what they mean, how they affect your holdings, and what you should do when a company announces them.</div>
+      <div class="article-meta"><span>Mar 12, 2025</span><span class="read-time">4 min read</span></div>
+    </div>
+    <div class="article-card">
+      <div class="article-cat ac-technical">Technical</div>
+      <div class="article-title">RSI Explained: Spotting Overbought & Oversold Stocks on NEPSE</div>
+      <div class="article-excerpt">Use the Relative Strength Index to time your entries and exits. Includes real examples from BPCL and LICN during the last market cycle.</div>
+      <div class="article-meta"><span>Mar 5, 2025</span><span class="read-time">7 min read</span></div>
+    </div>
+  </div>
+
+  <!-- GLOSSARY -->
+  <div class="section-title">NEPSE Glossary</div>
+  <div class="glossary-grid">
+    <div class="glossary-item"><div class="g-term">DEMAT Account</div><div class="g-def">A dematerialized account that holds your shares electronically through CDSC Nepal. Required to buy and sell stocks on NEPSE.</div></div>
+    <div class="glossary-item"><div class="g-term">MeroShare</div><div class="g-def">CDSC's online portal where investors apply for IPOs, check allotment results, and view their DEMAT holdings.</div></div>
+    <div class="glossary-item"><div class="g-term">ASBA</div><div class="g-def">Application Supported by Blocked Amount. Your bank blocks the IPO application amount in your account — it's only debited if you receive an allotment.</div></div>
+    <div class="glossary-item"><div class="g-term">LTP</div><div class="g-def">Last Traded Price — the most recent price at which a stock was bought or sold during the trading session.</div></div>
+    <div class="glossary-item"><div class="g-term">Circuit Breaker</div><div class="g-def">A rule that automatically halts trading in a stock or the whole market if the price moves beyond a set limit (e.g., 5% or 10%).</div></div>
+    <div class="glossary-item"><div class="g-term">Floorsheet</div><div class="g-def">A daily transaction record published by NEPSE showing every trade executed, including buyer and seller broker codes.</div></div>
+    <div class="glossary-item"><div class="g-term">Rights Share</div><div class="g-def">Additional shares offered to existing shareholders at a discounted price, usually to raise capital. Shareholders can subscribe or sell their rights entitlement.</div></div>
+    <div class="glossary-item"><div class="g-term">Bonus Share</div><div class="g-def">Free shares issued to existing shareholders from a company's reserve funds, proportional to their current holdings. Does not change total portfolio value immediately.</div></div>
+  </div>
+
+  <!-- FAQ -->
+  <div class="section-title">Frequently Asked Questions</div>
+  <div id="faq">
+    <div class="faq-item open">
+      <div class="faq-q" onclick="toggleFaq(this)">How do I start investing in NEPSE as a beginner? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Start by opening a DEMAT account through CDSC Nepal via a registered broker. Then register on MeroShare. You can begin by applying for IPOs, which are lower risk, before buying secondary market shares. Always start with blue-chip stocks like NABIL or NICA before exploring smaller companies.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What are NEPSE trading hours? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">NEPSE trading hours are Sunday to Thursday, 11:00 AM to 3:00 PM Nepal Standard Time. Pre-open session runs from 10:45 to 11:00 AM. Markets are closed on Fridays, Saturdays, and public holidays.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">What is the minimum amount needed to invest in NEPSE? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">For IPOs, the minimum application is 10 units at NPR 100 each = NPR 1,000. For secondary market purchases, it depends on the stock price — you can buy as little as 1 unit of any stock. Cheaper stocks like UPPER (NPR 224) allow entry with very small capital.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">How does dividend work in Nepal? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Nepali companies typically announce dividends after their AGM. Cash dividends are directly deposited to your bank account linked to your DEMAT. Bonus shares are credited to your DEMAT account. You must hold shares before the book closure date to be eligible.</div>
+    </div>
+    <div class="faq-item">
+      <div class="faq-q" onclick="toggleFaq(this)">Is capital gains tax applicable on NEPSE shares? <span class="faq-arrow">▼</span></div>
+      <div class="faq-a">Yes. As of current Nepal tax law, a 5% capital gains tax applies for individual investors on profits from share sales, and 10% for institutional investors. Losses cannot be carried forward. Dividend income is taxed at 5% at source (TDS).</div>
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="footer-bottom-left">© 2025 NepSera Technologies Pvt. Ltd. · Educational content is for informational purposes only.</div>
+    <div style="font-size:12px;color:var(--text3);">Data Partners: NEPSE · SEBON · NRB</div>
+  </div>
+</footer>
+
+<script>
+const tickerData=[{sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},{sym:'NICA',val:'920',chg:'+1.32%',up:true},{sym:'BPCL',val:'595',chg:'+7.40%',up:true},{sym:'UPPER',val:'224',chg:'+9.80%',up:true},{sym:'SHPC',val:'388',chg:'-2.02%',up:false},{sym:'LICN',val:'1,197',chg:'-5.80%',up:false}];
+const t=document.getElementById('ticker');
+const items=tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span style="color:var(--text)">${d.val}</span><span style="color:${d.up?'var(--green)':'var(--red)'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
+t.innerHTML=items+items;
+
+function toggleFaq(el){
+  const item=el.parentElement;
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
+  if(!isOpen)item.classList.add('open');
+}
+</script>
+</body>
+</html>

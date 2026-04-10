@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Markets — NepSera</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root{--bg:#0b0e14;--surface:#111520;--surface2:#161c2a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#3d7fff;--accent2:#5b9bff;--green:#10c98a;--green-dim:rgba(16,201,138,0.12);--red:#f05252;--red-dim:rgba(240,82,82,0.12);--gold:#f5c542;--text:#e8eaf0;--text2:#8890a4;--text3:#545e75;--radius:14px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+.ticker-wrap{background:var(--surface);border-bottom:1px solid var(--border);overflow:hidden;padding:8px 0;position:relative;}
+.ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;width:60px;height:100%;z-index:2;}
+.ticker-wrap::before{left:0;background:linear-gradient(to right,var(--surface),transparent);}
+.ticker-wrap::after{right:0;background:linear-gradient(to left,var(--surface),transparent);}
+.ticker{display:flex;animation:ticker 30s linear infinite;width:max-content;}
+.ticker-item{display:flex;align-items:center;gap:6px;padding:0 28px;font-size:12px;font-weight:500;white-space:nowrap;font-family:'JetBrains Mono',monospace;}
+.ticker-item .sym{color:var(--text2);}
+.ticker-sep{width:1px;height:14px;background:var(--border2);}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 40px;border-bottom:1px solid var(--border);background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.logo-area{display:flex;align-items:center;gap:14px;}
+.logo-img{height:70px;width:auto;object-fit:contain;filter:brightness(1.1);}
+.logo-text{display:flex;flex-direction:column;}
+.logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.5px;line-height:1;}
+.logo-tagline{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
+.ai-badge{display:flex;align-items:center;gap:5px;font-size:11px;background:rgba(61,127,255,0.12);color:var(--accent2);padding:4px 10px;border-radius:20px;font-weight:600;border:1px solid rgba(61,127,255,0.25);}
+.ai-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--accent);animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,127,255,0.6)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(61,127,255,0)}}
+.nav-links{display:flex;gap:4px;}
+.nav-link{font-size:13px;color:var(--text2);padding:7px 14px;border-radius:8px;cursor:pointer;transition:all .2s;text-decoration:none;font-weight:500;}
+.nav-link:hover{color:var(--text);background:rgba(255,255,255,0.05);}
+.nav-link.active{color:var(--accent2);background:rgba(61,127,255,0.1);}
+.topbar-right{display:flex;align-items:center;gap:12px;}
+.mkt-badge{font-size:11px;padding:4px 10px;border-radius:5px;font-weight:600;background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
+.btn-login{font-size:12px;font-weight:600;padding:7px 18px;border:1px solid var(--accent);border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);cursor:pointer;transition:all .2s;}
+.btn-login:hover{background:rgba(61,127,255,0.2);}
+.wrap{max-width:1280px;margin:0 auto;padding:32px 40px 60px;}
+.page-hero{margin-bottom:32px;}
+.page-title{font-family:'DM Serif Display',serif;font-size:34px;color:var(--text);letter-spacing:-.5px;margin-bottom:6px;}
+.page-sub{font-size:14px;color:var(--text3);}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;}
+.metric::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(61,127,255,0.3),transparent);}
+.mlabel{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:8px;}
+.mval{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+.mchg{font-size:12px;margin-top:6px;font-weight:500;}
+.up{color:var(--green);}.dn{color:var(--red);}
+.g2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:20px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;}
+.card-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;}
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{font-size:10px;color:var(--text3);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px;}
+.tbl td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .15s;}
+.tbl tr:hover td{background:rgba(255,255,255,0.025);}
+.tbl tr:last-child td{border-bottom:none;}
+.bdg{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;}
+.bdg-u{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
+.bdg-d{background:var(--red-dim);color:var(--red);border:1px solid rgba(240,82,82,0.2);}
+.sec-pill{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border);}
+.idx-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.idx-row:last-child{border-bottom:none;}
+.idx-name{font-size:13px;font-weight:600;}
+.idx-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.idx-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;text-align:right;}
+.mini-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.06);margin-top:5px;width:80px;}
+.mini-fill{height:100%;border-radius:2px;}
+footer{background:var(--surface);border-top:1px solid var(--border);margin-top:60px;}
+.footer-bottom{max-width:1280px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.footer-bottom-left{font-size:12px;color:var(--text3);}
+@media(max-width:900px){.metrics{grid-template-columns:1fr 1fr;}.g2,.g3{grid-template-columns:1fr;}.topbar{padding:10px 20px;}.wrap{padding:24px 20px 40px;}.nav-links{display:none;}}
+</style>
+</head>
+<body>
+
+<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+
+<div class="topbar">
+  <div class="logo-area">
+    <img src="logo1.png" alt="NepSera" class="logo-img">
+    <div class="logo-text">
+      <span class="logo-name">NepSera</span>
+      <span class="logo-tagline">Nepal Stock Intelligence</span>
+    </div>
+    <div class="ai-badge">AI-Powered</div>
+  </div>
+  <div class="nav-links">
+    <a class="nav-link active" href="markets.html">Markets</a>
+    <a class="nav-link" href="ipo.html">IPO</a>
+    <a class="nav-link" href="research.html">Research</a>
+    <a class="nav-link" href="learn.html">Learn</a>
+    <a class="nav-link" href="index.html">Dashboard</a>
+  </div>
+  <div class="topbar-right">
+    <div class="mkt-badge">● Market Open</div>
+    <button class="btn-login">Sign In</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="page-hero">
+    <div class="page-title">Markets</div>
+    <div class="page-sub">Live NEPSE data · All indices · Sector breakdown · Real-time movers</div>
+  </div>
+
+  <div class="metrics">
+    <div class="metric"><div class="mlabel">NEPSE Index</div><div class="mval">2,341.58</div><div class="mchg up">▲ 18.42 (0.79%)</div></div>
+    <div class="metric"><div class="mlabel">Sensitive Index</div><div class="mval">418.72</div><div class="mchg up">▲ 3.14 (0.76%)</div></div>
+    <div class="metric"><div class="mlabel">Float Index</div><div class="mval">164.38</div><div class="mchg up">▲ 1.92 (1.18%)</div></div>
+    <div class="metric"><div class="mlabel">Turnover</div><div class="mval">3.2B</div><div class="mchg up">▲ 12.4% vs prev</div></div>
+    <div class="metric"><div class="mlabel">Transactions</div><div class="mval">61,240</div><div class="mchg up">▲ 7.8%</div></div>
+  </div>
+
+  <div class="g2">
+    <div class="card">
+      <div class="card-title">NEPSE Index — Live Chart</div>
+      <div style="height:240px;"><canvas id="idxChart"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Sub-Indices</div>
+      <div class="idx-row"><div><div class="idx-name">Banking</div><div class="idx-sub">27 companies</div></div><div><div class="idx-val up">1,184.3</div><div class="mini-bar"><div class="mini-fill" style="width:70%;background:var(--green);"></div></div></div></div>
+      <div class="idx-row"><div><div class="idx-name">Hydropower</div><div class="idx-sub">64 companies</div></div><div><div class="idx-val up">2,847.6</div><div class="mini-bar"><div class="mini-fill" style="width:85%;background:var(--green);"></div></div></div></div>
+      <div class="idx-row"><div><div class="idx-name">Insurance</div><div class="idx-sub">19 companies</div></div><div><div class="idx-val dn">6,312.1</div><div class="mini-bar"><div class="mini-fill" style="width:40%;background:var(--red);"></div></div></div></div>
+      <div class="idx-row"><div><div class="idx-name">Finance</div><div class="idx-sub">17 companies</div></div><div><div class="idx-val up">734.9</div><div class="mini-bar"><div class="mini-fill" style="width:55%;background:var(--green);"></div></div></div></div>
+      <div class="idx-row"><div><div class="idx-name">Manufacturing</div><div class="idx-sub">22 companies</div></div><div><div class="idx-val dn">3,108.4</div><div class="mini-bar"><div class="mini-fill" style="width:30%;background:var(--red);"></div></div></div></div>
+    </div>
+  </div>
+
+  <div class="g3">
+    <div class="card">
+      <div class="card-title">Top Gainers</div>
+      <table class="tbl"><thead><tr><th>Symbol</th><th>LTP</th><th>Change</th></tr></thead><tbody>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">UPPER</td><td style="font-family:'JetBrains Mono',monospace;">224</td><td><span class="bdg bdg-u">+9.9%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">BPCL</td><td style="font-family:'JetBrains Mono',monospace;">595</td><td><span class="bdg bdg-u">+7.2%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NHPC</td><td style="font-family:'JetBrains Mono',monospace;">318</td><td><span class="bdg bdg-u">+5.8%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">SBI</td><td style="font-family:'JetBrains Mono',monospace;">412</td><td><span class="bdg bdg-u">+4.4%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NABIL</td><td style="font-family:'JetBrains Mono',monospace;">1,363</td><td><span class="bdg bdg-u">+1.6%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-title">Top Losers</div>
+      <table class="tbl"><thead><tr><th>Symbol</th><th>LTP</th><th>Change</th></tr></thead><tbody>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">LICN</td><td style="font-family:'JetBrains Mono',monospace;">1,197</td><td><span class="bdg bdg-d">-5.8%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">ADBL</td><td style="font-family:'JetBrains Mono',monospace;">376</td><td><span class="bdg bdg-d">-4.1%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NGPL</td><td style="font-family:'JetBrains Mono',monospace;">854</td><td><span class="bdg bdg-d">-3.3%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">PRVU</td><td style="font-family:'JetBrains Mono',monospace;">281</td><td><span class="bdg bdg-d">-2.7%</span></td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">SHINE</td><td style="font-family:'JetBrains Mono',monospace;">143</td><td><span class="bdg bdg-d">-1.9%</span></td></tr>
+      </tbody></table>
+    </div>
+    <div class="card">
+      <div class="card-title">Most Active</div>
+      <table class="tbl"><thead><tr><th>Symbol</th><th>Volume</th><th>Turnover</th></tr></thead><tbody>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NABIL</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">1.8M</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">245M</td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">UPPER</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">1.2M</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">269M</td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NICA</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">980K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">902M</td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">ADBL</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">510K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">192M</td></tr>
+        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">BPCL</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">840K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">500M</td></tr>
+      </tbody></table>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">All Listed Securities</div>
+    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
+      <span style="font-size:12px;padding:5px 14px;border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);border:1px solid rgba(61,127,255,0.25);cursor:pointer;font-weight:600;">All</span>
+      <span class="sec-pill" style="cursor:pointer;">Banking</span>
+      <span class="sec-pill" style="cursor:pointer;">Hydropower</span>
+      <span class="sec-pill" style="cursor:pointer;">Insurance</span>
+      <span class="sec-pill" style="cursor:pointer;">Finance</span>
+      <span class="sec-pill" style="cursor:pointer;">Manufacturing</span>
+      <span class="sec-pill" style="cursor:pointer;">Hotels</span>
+      <span class="sec-pill" style="cursor:pointer;">Others</span>
+    </div>
+    <table class="tbl"><thead><tr><th>Symbol</th><th>Company</th><th>Sector</th><th>LTP (NPR)</th><th>Change</th><th>Volume</th><th>Turnover</th><th>52W High</th><th>52W Low</th></tr></thead><tbody>
+      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NABIL</td><td style="color:var(--text2);">Nabil Bank Ltd.</td><td><span class="sec-pill">Banking</span></td><td style="font-family:'JetBrains Mono',monospace;">1,363</td><td><span class="bdg bdg-u">+1.64%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">310K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">422M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">1,580</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">1,090</td></tr>
+      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NICA</td><td style="color:var(--text2);">NIC Asia Bank</td><td><span class="sec-pill">Banking</span></td><td style="font-family:'JetBrains Mono',monospace;">920</td><td><span class="bdg bdg-u">+1.32%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">980K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">902M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">1,140</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">748</td></tr>
+      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">BPCL</td><td style="color:var(--text2);">Butwal Power Co.</td><td><span class="sec-pill">Hydropower</span></td><td style="font-family:'JetBrains Mono',monospace;">595</td><td><span class="bdg bdg-u">+7.40%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">840K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">500M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">680</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">410</td></tr>
+      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">UPPER</td><td style="color:var(--text2);">Upper Tamakoshi Hydro</td><td><span class="sec-pill">Hydropower</span></td><td style="font-family:'JetBrains Mono',monospace;">224</td><td><span class="bdg bdg-u">+9.80%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">1.2M</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">269M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">296</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">148</td></tr>
+      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">LICN</td><td style="color:var(--text2);">Life Insurance Corp. Nepal</td><td><span class="sec-pill">Insurance</span></td><td style="font-family:'JetBrains Mono',monospace;">1,197</td><td><span class="bdg bdg-d">-5.80%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">280K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">335M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">1,540</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">980</td></tr>
+      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">ADBL</td><td style="color:var(--text2);">Agricultural Dev. Bank</td><td><span class="sec-pill">Banking</span></td><td style="font-family:'JetBrains Mono',monospace;">376</td><td><span class="bdg bdg-d">-4.10%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">510K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">192M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">498</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">290</td></tr>
+      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">SHPC</td><td style="color:var(--text2);">Sanima Hydropower</td><td><span class="sec-pill">Hydropower</span></td><td style="font-family:'JetBrains Mono',monospace;">388</td><td><span class="bdg bdg-d">-2.02%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">420K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">163M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">472</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">298</td></tr>
+    </tbody></table>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-bottom">
+    <div class="footer-bottom-left">© 2025 NepSera Technologies Pvt. Ltd. · Kathmandu, Nepal · Data is for informational purposes only.</div>
+    <div style="font-size:12px;color:var(--text3);">Data Partners: NEPSE · SEBON · NRB</div>
+  </div>
+</footer>
+
+<script>
+const tickerData=[{sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},{sym:'NICA',val:'920',chg:'+1.32%',up:true},{sym:'BPCL',val:'595',chg:'+7.40%',up:true},{sym:'UPPER',val:'224',chg:'+9.80%',up:true},{sym:'SHPC',val:'388',chg:'-2.02%',up:false},{sym:'LICN',val:'1,197',chg:'-5.80%',up:false},{sym:'ADBL',val:'376',chg:'-4.10%',up:false},{sym:'SBI',val:'412',chg:'+4.40%',up:true}];
+const t=document.getElementById('ticker');
+const items=tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span style="color:var(--text)">${d.val}</span><span style="color:${d.up?'var(--green)':'var(--red)'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
+t.innerHTML=items+items;
+const days30=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
+let b=2200;const idxD=days30.map(()=>{b+=4+(Math.random()-.38)*20;return Math.round(b);});idxD[29]=2341;
+Chart.defaults.color='#8890a4';Chart.defaults.font={family:"'DM Sans',sans-serif",size:11};
+new Chart(document.getElementById('idxChart'),{type:'line',data:{labels:days30,datasets:[{data:idxD,borderColor:'#3d7fff',borderWidth:2,fill:true,backgroundColor:(ctx)=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,220);g.addColorStop(0,'rgba(61,127,255,0.18)');g.addColorStop(1,'rgba(61,127,255,0)');return g;},pointRadius:0,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{callback:v=>v.toLocaleString()}}}}});
+</script>
+</body>
+</html>
