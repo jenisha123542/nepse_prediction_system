@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NepSera — Admin Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #0b0e14;
+  --surface: #111520;
+  --surface2: #161c2a;
+  --border: rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.12);
+  --accent: #3d7fff;
+  --accent2: #5b9bff;
+  --green: #10c98a;
+  --green-dim: rgba(16,201,138,0.12);
+  --red: #f05252;
+  --red-dim: rgba(240,82,82,0.12);
+  --gold: #f5c542;
+  --gold-dim: rgba(245,197,66,0.12);
+  --text: #e8eaf0;
+  --text2: #8890a4;
+  --text3: #545e75;
+  --radius: 14px;
+  --radius-sm: 8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+/* TOPBAR */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid var(--border);background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
+.logo-area{display:flex;align-items:center;gap:14px;}
+.logo-img-icon {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(1.1);
+}.logo-text{display:flex;flex-direction:column;}
+.logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.5px;line-height:1;}
+.logo-tagline{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
+.admin-badge{display:flex;align-items:center;gap:5px;font-size:11px;background:var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:20px;font-weight:700;border:1px solid rgba(245,197,66,0.25);letter-spacing:.4px;}
+.admin-badge::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--gold);animation:pulse-gold 2s infinite;}
+@keyframes pulse-gold{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(245,197,66,0.6)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(245,197,66,0)}}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(61,127,255,0.6)}50%{opacity:.8;box-shadow:0 0 0 5px rgba(61,127,255,0)}}
+.topbar-right{display:flex;align-items:center;gap:16px;}
+.dt-display{font-size:12px;color:var(--text3);font-family:'JetBrains Mono',monospace;}
+.avatar-wrap{display:flex;align-items:center;gap:9px;background:var(--surface2);border:1px solid var(--border2);padding:6px 12px 6px 8px;border-radius:20px;cursor:pointer;transition:border-color .2s;}
+.avatar-wrap:hover{border-color:rgba(245,197,66,0.3);}
+.avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#e67e22);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1a1a1a;}
+.avatar-name{font-size:12px;font-weight:600;color:var(--text);}
+.btn-signout{font-size:12px;padding:6px 14px;border:1px solid rgba(240,82,82,0.3);border-radius:20px;background:rgba(240,82,82,0.06);color:var(--red);cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+.btn-signout:hover{background:rgba(240,82,82,0.12);border-color:rgba(240,82,82,0.5);}
+
+/* TABS */
+.tabs-wrap{padding:0 40px;background:var(--bg);border-bottom:1px solid var(--border);}
+.tabs{display:flex;gap:0;overflow-x:auto;scrollbar-width:none;}
+.tabs::-webkit-scrollbar{display:none;}
+.tab-btn{font-size:13px;font-weight:500;padding:15px 22px;border:none;background:transparent;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:7px;font-family:'DM Sans',sans-serif;}
+.tab-btn:hover{color:var(--text);}
+.tab-btn.active{color:var(--gold);border-bottom-color:var(--gold);font-weight:600;}
+.tab-icon{font-size:14px;}
+
+/* LAYOUT */
+.wrap{max-width:1280px;margin:0 auto;padding:32px 40px 60px;}
+.pane{display:none;}
+.pane.active{display:block;animation:fadeIn .3s ease;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;}
+.metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px 20px;position:relative;overflow:hidden;transition:border-color .2s;}
+.metric::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(245,197,66,0.3),transparent);}
+.metric:hover{border-color:var(--border2);}
+.mlabel{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:10px;}
+.mval{font-size:24px;font-weight:700;color:var(--text);line-height:1;font-family:'JetBrains Mono',monospace;}
+.mchg{font-size:12px;margin-top:8px;font-weight:500;display:flex;align-items:center;gap:4px;}
+.up{color:var(--green);}.dn{color:var(--red);}
+
+/* CARDS */
+.g2{display:grid;grid-template-columns:1.7fr 1fr;gap:16px;margin-bottom:16px;}
+.g2e{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;margin-bottom:16px;}
+.card:last-child{margin-bottom:0;}
+.card-title{font-size:12px;font-weight:600;color:var(--text2);margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;}
+.card-title::before{content:'';width:3px;height:14px;background:var(--gold);border-radius:2px;}
+.card-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px;}
+.cwrap{position:relative;width:100%;}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.tbl th{font-size:10px;color:var(--text3);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.6px;}
+.tbl td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.04);color:var(--text);transition:background .15s;}
+.tbl tr:hover td{background:rgba(255,255,255,0.025);}
+.tbl tr:last-child td{border-bottom:none;}
+
+/* BADGES */
+.bdg{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 9px;border-radius:5px;}
+.bdg-g{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
+.bdg-r{background:var(--red-dim);color:var(--red);border:1px solid rgba(240,82,82,0.2);}
+.bdg-b{background:rgba(61,127,255,0.12);color:var(--accent2);border:1px solid rgba(61,127,255,0.2);}
+.bdg-a{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(245,197,66,0.2);}
+.bdg-y{background:rgba(255,255,255,0.06);color:var(--text2);border:1px solid var(--border2);}
+
+/* BUTTONS */
+.act-btn{font-size:11px;padding:4px 12px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;margin-right:4px;transition:all .15s;font-family:'DM Sans',sans-serif;}
+.act-btn:hover{border-color:var(--accent);color:var(--accent2);}
+.act-btn.danger:hover{border-color:var(--red);color:var(--red);}
+.add-btn{font-size:12px;padding:8px 16px;border:1px solid var(--accent);border-radius:var(--radius-sm);background:rgba(61,127,255,0.12);color:var(--accent2);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .2s;}
+.add-btn:hover{background:rgba(61,127,255,0.2);}
+.add-btn.gold{border-color:rgba(245,197,66,0.4);background:var(--gold-dim);color:var(--gold);}
+.add-btn.gold:hover{background:rgba(245,197,66,0.2);}
+.add-btn.danger{border-color:rgba(240,82,82,0.3);background:var(--red-dim);color:var(--red);}
+
+/* SEARCH ROW */
+.search-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.search-row input,.search-row select{font-size:12px;padding:8px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);outline:none;font-family:'DM Sans',sans-serif;}
+.search-row input{flex:1;min-width:160px;}
+.search-row input::placeholder{color:var(--text3);}
+.search-row input:focus,.search-row select:focus{border-color:var(--accent);}
+.search-row select option{background:var(--surface2);}
+
+/* FORM */
+.form-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px;}
+.form-group label{font-size:11px;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.6px;}
+.form-group input,.form-group select,.form-group textarea{font-size:13px;padding:10px 12px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);outline:none;font-family:'DM Sans',sans-serif;transition:border-color .2s;}
+.form-group input:focus,.form-group select:focus,.form-group textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(61,127,255,0.1);}
+.form-group input::placeholder{color:var(--text3);}
+.form-group select option{background:var(--surface2);}
+.form-group textarea{resize:vertical;min-height:70px;}
+.form-2col{display:grid;grid-template-columns:1fr 1fr;gap:0 14px;}
+
+/* TOGGLE */
+.tog{width:38px;height:21px;border-radius:11px;background:var(--border2);position:relative;cursor:pointer;border:none;flex-shrink:0;transition:background .2s;}
+.tog.on{background:var(--accent);}
+.tog::after{content:'';position:absolute;top:3px;left:3px;width:15px;height:15px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,0.3);}
+.tog.on::after{left:20px;}
+.tog-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);}
+.tog-row:last-child{border-bottom:none;}
+.tog-label{font-size:13px;color:var(--text2);}
+
+/* PROGRESS */
+.prog-bar{height:4px;border-radius:2px;background:rgba(255,255,255,0.06);overflow:hidden;margin-top:6px;}
+.prog-fill{height:100%;border-radius:2px;}
+
+/* LOG ROWS */
+.log-row{display:flex;gap:14px;padding:10px 0;border-bottom:1px solid var(--border);font-size:12px;align-items:flex-start;}
+.log-row:last-child{border-bottom:none;}
+.log-time{color:var(--text3);white-space:nowrap;min-width:130px;font-family:'JetBrains Mono',monospace;font-size:11px;}
+.log-user{font-weight:700;white-space:nowrap;min-width:110px;}
+.log-action{color:var(--text2);}
+
+/* ALERT ITEMS */
+.alert-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.alert-item:last-child{border-bottom:none;}
+.alert-dot{width:8px;height:8px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+.atext{font-size:13px;color:var(--text);line-height:1.5;flex:1;}
+.ameta{font-size:11px;color:var(--text3);margin-top:3px;}
+
+/* MODEL CARD */
+.model-card{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:18px;margin-bottom:14px;}
+.model-name{font-size:14px;font-weight:700;color:var(--text);margin-bottom:4px;}
+.model-meta{font-size:11px;color:var(--text3);margin-bottom:12px;}
+.stat-row{display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:5px;}
+.stat-val{font-weight:600;color:var(--text);font-family:'JetBrains Mono',monospace;}
+
+/* SECTION HEADER */
+.sec-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:8px;}
+.sec-title{font-family:'DM Serif Display',serif;font-size:22px;color:var(--text);}
+.sec-sub{font-size:12px;color:var(--text3);background:rgba(255,255,255,0.04);padding:4px 12px;border-radius:20px;border:1px solid var(--border);}
+
+/* HERO STRIP */
+.hero-strip{background:linear-gradient(135deg,rgba(245,197,66,0.06) 0%,rgba(61,127,255,0.05) 100%);border:1px solid rgba(245,197,66,0.15);border-radius:var(--radius);padding:20px 24px;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
+.hero-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:1px;font-weight:600;margin-bottom:4px;}
+.hero-val{font-family:'DM Serif Display',serif;font-size:32px;color:var(--text);letter-spacing:-1px;}
+.hero-stats{display:flex;gap:28px;flex-wrap:wrap;}
+.hero-stat{display:flex;flex-direction:column;gap:3px;}
+.hstat-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
+.hstat-v{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
+/* RESPONSIVE */
+@media(max-width:1000px){
+  .topbar{padding:14px 20px;}
+  .tabs-wrap{padding:0 20px;}
+  .wrap{padding:24px 20px 40px;}
+  .metrics{grid-template-columns:1fr 1fr;}
+  .g2,.g2e,.g3{grid-template-columns:1fr;}
+}
+@media(max-width:600px){
+  .metrics{grid-template-columns:1fr 1fr;}
+  .form-2col{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- AUTH GUARD -->
+<script>
+(function() {
+  const user = JSON.parse(localStorage.getItem('nepseraUser') || 'null');
+  if (!user || user.role !== 'admin') {
+    alert('Access denied. Admins only.');
+    window.location.href = 'signin.html';
+  }
+})();
+</script>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo-area">
+    <img src="logo1.png" alt="NepSera" class="logo-img-icon">
+    <div class="logo-text">
+      <span class="logo-name">NepSera</span>
+      <span class="logo-tagline">Nepal Stock Intelligence</span>
+    </div>
+    <div class="admin-badge">Admin Panel</div>
+  </div>
+  <div class="topbar-right">
+    <div class="dt-display" id="dt"></div>
+    <div class="avatar-wrap" id="avatarWrap">
+      <div class="avatar" id="avatarInitials">AD</div>
+      <span class="avatar-name" id="adminName">Admin</span>
+    </div>
+    <button class="btn-signout" onclick="signOut()">Sign Out</button>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('dashboard',this)"><span class="tab-icon">📊</span>Dashboard</button>
+    <button class="tab-btn" onclick="showTab('users',this)"><span class="tab-icon">👥</span>Users</button>
+    <button class="tab-btn" onclick="showTab('stocks',this)"><span class="tab-icon">📈</span>Stock Data</button>
+    <button class="tab-btn" onclick="showTab('models',this)"><span class="tab-icon">🤖</span>ML Models</button>
+    <button class="tab-btn" onclick="showTab('alerts',this)"><span class="tab-icon">🔔</span>Alerts</button>
+    <button class="tab-btn" onclick="showTab('logs',this)"><span class="tab-icon">📋</span>Audit Logs</button>
+    <button class="tab-btn" onclick="showTab('settings',this)"><span class="tab-icon">⚙️</span>Settings</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <!-- DASHBOARD -->
+  <div class="pane active" id="pane-dashboard">
+    <div class="hero-strip">
+      <div>
+        <div class="hero-label">Admin Overview</div>
+        <div class="hero-val">NepSera Control</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;">All systems operational · Last sync 2 min ago</div>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat"><div class="hstat-l">Total Users</div><div class="hstat-v" style="color:var(--green);">1,248</div></div>
+        <div class="hero-stat"><div class="hstat-l">Active Now</div><div class="hstat-v">87</div></div>
+        <div class="hero-stat"><div class="hstat-l">Model Acc.</div><div class="hstat-v" style="color:var(--gold);">74.2%</div></div>
+        <div class="hero-stat"><div class="hstat-l">API Calls</div><div class="hstat-v">42.1K</div></div>
+      </div>
+    </div>
+
+    <div class="metrics">
+      <div class="metric">
+        <div class="mlabel">Total Users</div>
+        <div class="mval">1,248</div>
+        <div class="mchg up">▲ 34 this week</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">Active Sessions</div>
+        <div class="mval">87</div>
+        <div class="mchg" style="color:var(--text3);">right now</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">Model Accuracy</div>
+        <div class="mval">74.2%</div>
+        <div class="mchg up">▲ 1.4% vs last</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">API Calls Today</div>
+        <div class="mval">42.1K</div>
+        <div class="mchg up">▲ 8.3% vs avg</div>
+      </div>
+    </div>
+
+    <div class="g2" style="margin-bottom:16px;">
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">User Signups — Last 30 Days</div>
+        <div class="cwrap" style="height:200px;"><canvas id="signupChart"></canvas></div>
+      </div>
+      <div class="card" style="margin-bottom:0;">
+        <div class="card-title">API Usage by Endpoint</div>
+        <div class="cwrap" style="height:150px;"><canvas id="apiChart"></canvas></div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px 14px;margin-top:12px;font-size:11px;color:var(--text2);">
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--accent);margin-right:5px;vertical-align:middle;"></span>Predictions 45%</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--green);margin-right:5px;vertical-align:middle;"></span>Market data 32%</span>
+          <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--gold);margin-right:5px;vertical-align:middle;"></span>Portfolio 23%</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-bottom:0;">
+      <div class="card-hdr">
+        <div class="card-title" style="margin-bottom:0;">Recent Activity</div>
+        <span class="sec-sub">Last 5 events</span>
+      </div>
+      <div class="log-row"><span class="log-time">Today 14:32</span><span class="log-user" style="color:var(--accent2);">ram.thapa</span><span class="log-action">ran prediction on NABIL · 5-day window</span></div>
+      <div class="log-row"><span class="log-time">Today 14:28</span><span class="log-user" style="color:var(--accent2);">sita.rai</span><span class="log-action">exported portfolio report as PDF</span></div>
+      <div class="log-row"><span class="log-time">Today 14:15</span><span class="log-user" style="color:var(--gold);">admin</span><span class="log-action">deployed ML model v2.2 to production</span></div>
+      <div class="log-row"><span class="log-time">Today 13:50</span><span class="log-user" style="color:var(--accent2);">hari.bdr</span><span class="log-action">added 40 BPCL units to portfolio</span></div>
+      <div class="log-row"><span class="log-time">Today 13:44</span><span class="log-user" style="color:var(--gold);">admin</span><span class="log-action">updated NEPSE index data feed · 180 records</span></div>
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="pane" id="pane-users">
+    <div class="sec-hdr">
+      <div class="sec-title">User Management</div>
+      <button class="add-btn">+ Add User</button>
+    </div>
+    <div class="search-row">
+      <input type="text" placeholder="Search by name or email..." id="userSearch" oninput="filterUsers()"/>
+      <select id="roleFilter" onchange="filterUsers()">
+        <option value="">All roles</option>
+        <option>user</option>
+        <option>admin</option>
+      </select>
+      <select id="statusFilter" onchange="filterUsers()">
+        <option value="">All status</option>
+        <option>Active</option>
+        <option>Suspended</option>
+      </select>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:0;">
+      <table class="tbl">
+        <thead><tr><th style="padding-left:20px;">#</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+        <tbody id="userTbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- STOCK DATA -->
+  <div class="pane" id="pane-stocks">
+    <div class="sec-hdr">
+      <div class="sec-title">Stock Data Management</div>
+      <div style="display:flex;gap:8px;">
+        <button class="add-btn" style="border-color:var(--green);background:var(--green-dim);color:var(--green);">↻ Sync Live Data</button>
+        <button class="add-btn">+ Add Stock</button>
+      </div>
+    </div>
+    <div class="metrics" style="grid-template-columns:repeat(3,1fr);">
+      <div class="metric"><div class="mlabel">Stocks Tracked</div><div class="mval">214</div></div>
+      <div class="metric"><div class="mlabel">Last Sync</div><div class="mval" style="font-size:16px;">14:30 today</div><div class="mchg up">Successful</div></div>
+      <div class="metric"><div class="mlabel">Data Quality</div><div class="mval">98.4%</div><div class="mchg up">▲ 0.2%</div></div>
+    </div>
+    <div class="search-row">
+      <input type="text" placeholder="Search symbol or company..."/>
+      <select><option>All sectors</option><option>Banking</option><option>Hydropower</option><option>Insurance</option><option>Finance</option></select>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:0;">
+      <table class="tbl">
+        <thead><tr><th style="padding-left:20px;">Symbol</th><th>Company</th><th>Sector</th><th>LTP</th><th>52W High</th><th>52W Low</th><th>Status</th><th>Actions</th></tr></thead>
+        <tbody>
+          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">NABIL</td><td style="color:var(--text2);">Nabil Bank Ltd.</td><td style="color:var(--text3);">Banking</td><td style="font-family:'JetBrains Mono',monospace;">1,363</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">1,512</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">980</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">NICA</td><td style="color:var(--text2);">NIC Asia Bank</td><td style="color:var(--text3);">Banking</td><td style="font-family:'JetBrains Mono',monospace;">920</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">1,080</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">710</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">BPCL</td><td style="color:var(--text2);">Butwal Power Co.</td><td style="color:var(--text3);">Hydropower</td><td style="font-family:'JetBrains Mono',monospace;">595</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">640</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">390</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">UPPER</td><td style="color:var(--text2);">Upper Tamakoshi</td><td style="color:var(--text3);">Hydropower</td><td style="font-family:'JetBrains Mono',monospace;">224</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">310</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">180</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">LICN</td><td style="color:var(--text2);">Life Insurance Corp.</td><td style="color:var(--text3);">Insurance</td><td style="font-family:'JetBrains Mono',monospace;">1,197</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">1,450</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">890</td><td><span class="bdg bdg-a">Delayed</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">ADBL</td><td style="color:var(--text2);">Agric. Dev. Bank</td><td style="color:var(--text3);">Banking</td><td style="font-family:'JetBrains Mono',monospace;">376</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">480</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">290</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">SHPC</td><td style="color:var(--text2);">Sanima Hydropower</td><td style="color:var(--text3);">Hydropower</td><td style="font-family:'JetBrains Mono',monospace;">388</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">430</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">280</td><td><span class="bdg bdg-r">Stale</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ML MODELS -->
+  <div class="pane" id="pane-models">
+    <div class="sec-hdr"><div class="sec-title">ML Model Management</div></div>
+    <div class="g2e">
+      <div>
+        <div class="model-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div class="model-name">Price Predictor v2.2</div><span class="bdg bdg-g">Production</span>
+          </div>
+          <div class="model-meta">LSTM · 60-day lookback · 5-day horizon</div>
+          <div class="stat-row"><span>Accuracy</span><span class="stat-val up">74.2%</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:74%;background:var(--green);"></div></div>
+          <div class="stat-row" style="margin-top:12px;"><span>Last trained</span><span class="stat-val">Apr 14, 2026</span></div>
+          <div class="stat-row"><span>Training records</span><span class="stat-val">184,200</span></div>
+          <div class="stat-row"><span>Predictions served</span><span class="stat-val">28,440</span></div>
+          <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="act-btn">Retrain</button><button class="act-btn">Metrics</button><button class="act-btn">Export</button>
+          </div>
+        </div>
+        <div class="model-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div class="model-name">Sentiment Classifier v1.3</div><span class="bdg bdg-g">Production</span>
+          </div>
+          <div class="model-meta">BERT fine-tuned · Nepali + English news</div>
+          <div class="stat-row"><span>F1 score</span><span class="stat-val up">81.6%</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:82%;background:var(--accent);"></div></div>
+          <div class="stat-row" style="margin-top:12px;"><span>Last trained</span><span class="stat-val">Apr 10, 2026</span></div>
+          <div class="stat-row"><span>Items processed/day</span><span class="stat-val">12,800</span></div>
+          <div style="margin-top:14px;display:flex;gap:6px;">
+            <button class="act-btn">Retrain</button><button class="act-btn">Metrics</button>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="model-card">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;">
+            <div class="model-name">Price Predictor v2.3-beta</div><span class="bdg bdg-a">Staging</span>
+          </div>
+          <div class="model-meta">Transformer · 90-day lookback · multi-horizon</div>
+          <div class="stat-row"><span>Accuracy</span><span class="stat-val up">77.8%</span></div>
+          <div class="prog-bar"><div class="prog-fill" style="width:78%;background:var(--gold);"></div></div>
+          <div class="stat-row" style="margin-top:12px;"><span>Status</span><span class="stat-val" style="color:var(--gold);">A/B testing (20%)</span></div>
+          <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;">
+            <button class="add-btn gold" style="font-size:11px;padding:5px 12px;">Promote to Prod</button>
+            <button class="act-btn">Rollback</button>
+          </div>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Accuracy Trend — 12 Months</div>
+          <div class="cwrap" style="height:160px;"><canvas id="modelChart"></canvas></div>
+          <div style="display:flex;gap:14px;margin-top:12px;font-size:11px;color:var(--text2);">
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--green);margin-right:5px;vertical-align:middle;"></span>v2.2 prod</span>
+            <span><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--gold);margin-right:5px;vertical-align:middle;"></span>v2.3β staging</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ALERTS -->
+  <div class="pane" id="pane-alerts">
+    <div class="sec-hdr">
+      <div class="sec-title">Alert Management</div>
+      <button class="add-btn">+ New Alert Rule</button>
+    </div>
+    <div class="g2e">
+      <div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-hdr">
+            <div class="card-title" style="margin-bottom:0;">Active System Alerts</div>
+            <span class="bdg bdg-r">3 critical</span>
+          </div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">SHPC data feed stale — no update in 4h<div class="ameta">Data pipeline · 4h ago</div></div><button class="act-btn danger">Resolve</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">Model v2.2 accuracy below 70% threshold for LICN<div class="ameta">ML Monitor · 2h ago</div></div><button class="act-btn danger">Resolve</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">API rate limit hit — 3 users blocked in last hour<div class="ameta">API Gateway · 1h ago</div></div><button class="act-btn danger">Resolve</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--gold);"></div><div class="atext">Database storage at 78% capacity<div class="ameta">Infrastructure · 30m ago</div></div><button class="act-btn">Dismiss</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--accent);"></div><div class="atext">New user registrations spiked 3× normal rate<div class="ameta">Analytics · 20m ago</div></div><button class="act-btn">Dismiss</button></div>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:16px;">
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Alert Rules</div>
+          <table class="tbl">
+            <thead><tr><th>Rule</th><th>Threshold</th><th>State</th><th></th></tr></thead>
+            <tbody>
+              <tr><td style="color:var(--text2);">Model accuracy drop</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&lt; 70%</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">Data feed stale</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 2h lag</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">API rate limit</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 1000/min</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">DB storage</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 80%</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">Circuit breaker</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">±5%</td><td><span class="bdg bdg-y">Off</span></td><td><button class="act-btn">Edit</button></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card" style="margin-bottom:0;">
+          <div class="card-title">Notification Channels</div>
+          <div class="tog-row"><span class="tog-label">Email (admin@nepsera.com)</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">SMS to +977-98XXXXXXXX</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">Slack #nepse-alerts</span><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- AUDIT LOGS -->
+  <div class="pane" id="pane-logs">
+    <div class="sec-hdr">
+      <div class="sec-title">Audit Logs</div>
+      <div style="display:flex;gap:8px;">
+        <button class="add-btn" style="border-color:var(--green);background:var(--green-dim);color:var(--green);">Export CSV</button>
+        <select style="font-size:12px;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+          <option>All actions</option><option>Login</option><option>Data change</option><option>Model deploy</option><option>User change</option>
+        </select>
+      </div>
+    </div>
+    <div class="search-row">
+      <input type="text" placeholder="Search logs by user, action, or IP..."/>
+      <select><option>Last 24h</option><option>Last 7 days</option><option>Last 30 days</option></select>
+    </div>
+    <div class="card" style="padding:0;overflow:hidden;margin-bottom:0;">
+      <table class="tbl">
+        <thead><tr><th style="padding-left:20px;">Timestamp</th><th>User</th><th>Action</th><th>Resource</th><th>IP Address</th><th>Status</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 14:32:11</td><td style="color:var(--accent2);font-weight:700;">ram.thapa</td><td style="color:var(--text2);">RUN_PREDICTION</td><td style="color:var(--text3);">NABIL / 5d</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">202.45.12.88</td><td><span class="bdg bdg-g">OK</span></td></tr>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 14:28:04</td><td style="color:var(--accent2);font-weight:700;">sita.rai</td><td style="color:var(--text2);">EXPORT_REPORT</td><td style="color:var(--text3);">Portfolio PDF</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">114.69.34.12</td><td><span class="bdg bdg-g">OK</span></td></tr>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 14:15:22</td><td style="color:var(--gold);font-weight:700;">admin</td><td style="color:var(--text2);">MODEL_DEPLOY</td><td style="color:var(--text3);">predictor-v2.2</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">10.0.0.1</td><td><span class="bdg bdg-g">OK</span></td></tr>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:50:01</td><td style="color:var(--accent2);font-weight:700;">hari.bdr</td><td style="color:var(--text2);">UPDATE_PORTFOLIO</td><td style="color:var(--text3);">BPCL +40 units</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">103.23.98.45</td><td><span class="bdg bdg-g">OK</span></td></tr>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:44:08</td><td style="color:var(--gold);font-weight:700;">admin</td><td style="color:var(--text2);">DATA_SYNC</td><td style="color:var(--text3);">NEPSE index feed</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">10.0.0.1</td><td><span class="bdg bdg-g">OK</span></td></tr>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:20:45</td><td style="color:var(--accent2);font-weight:700;">puja.shrestha</td><td style="color:var(--text2);">LOGIN</td><td style="color:var(--text3);">Web session</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">27.34.102.9</td><td><span class="bdg bdg-g">OK</span></td></tr>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:02:17</td><td style="color:var(--text3);font-weight:700;">unknown</td><td style="color:var(--text2);">LOGIN</td><td style="color:var(--text3);">Web session</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">185.220.101.4</td><td><span class="bdg bdg-r">Failed</span></td></tr>
+          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 12:55:30</td><td style="color:var(--gold);font-weight:700;">admin</td><td style="color:var(--text2);">USER_SUSPEND</td><td style="color:var(--text3);">user:tester99</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">10.0.0.1</td><td><span class="bdg bdg-g">OK</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="pane" id="pane-settings">
+    <div class="sec-hdr"><div class="sec-title">System Settings</div></div>
+    <div class="g2e">
+      <div>
+        <div class="card">
+          <div class="card-title">Data Feed Configuration</div>
+          <div class="form-group"><label>Primary Data Source</label><select><option>Merolagani API</option><option>Sharesansar API</option><option>NEPSE Official</option></select></div>
+          <div class="form-group"><label>Sync Interval</label><select><option>Every 5 minutes</option><option>Every 15 minutes</option><option>Every 1 hour</option></select></div>
+          <div class="form-group"><label>Backup Source</label><select><option>Sharesansar API</option><option>Manual CSV Upload</option></select></div>
+          <div class="form-group"><label>API Key</label><input type="password" value="merolagani_sk_live_xxxx" placeholder="API key"/></div>
+          <button class="add-btn" style="width:100%;">Save Data Settings</button>
+        </div>
+        <div class="card">
+          <div class="card-title">Prediction Engine</div>
+          <div class="form-group"><label>Default Model</label><select><option>Price Predictor v2.2</option><option>Price Predictor v2.3-beta</option></select></div>
+          <div class="form-group"><label>Default Prediction Horizon</label><select><option>5 trading days</option><option>10 trading days</option><option>30 trading days</option></select></div>
+          <div class="form-group"><label>Min. Confidence Threshold (%)</label><input type="number" value="55" min="0" max="100"/></div>
+          <button class="add-btn" style="width:100%;">Save Model Settings</button>
+        </div>
+      </div>
+      <div>
+        <div class="card">
+          <div class="card-title">Access Control</div>
+          <div class="tog-row"><span class="tog-label">Allow public registration</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">Email verification required</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">2FA for admin accounts</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">API rate limiting</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">Maintenance mode</span><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+        </div>
+        <div class="card">
+          <div class="card-title">Appearance &amp; Locale</div>
+          <div class="form-group"><label>App Name</label><input type="text" value="NepSera"/></div>
+          <div class="form-group"><label>Default Language</label><select><option>English</option><option>Nepali</option></select></div>
+          <div class="form-group"><label>Timezone</label><select><option>Asia/Kathmandu (NPT +5:45)</option><option>UTC</option></select></div>
+          <button class="add-btn" style="width:100%;">Save Appearance</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  // DATE
+  function tick(){const d=new Date();document.getElementById('dt').textContent=d.toLocaleString('en-NP',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
+  tick();setInterval(tick,60000);
+
+  // Load admin name from localStorage
+  const user = JSON.parse(localStorage.getItem('nepseraUser') || '{}');
+  if (user && user.name) {
+    document.getElementById('adminName').textContent = user.name;
+    const initials = user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
+    document.getElementById('avatarInitials').textContent = initials;
+  }
+
+  // SIGN OUT
+  window.signOut = function() {
+    if (confirm('Sign out of NepSera Admin?')) {
+      localStorage.removeItem('nepseraUser');
+      localStorage.removeItem('token');
+      window.location.href = 'signin.html';
+    }
+  };
+
+  // TABS
+  window.showTab = function(id, btn) {
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pane-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='models'&&!window._mc){buildModelChart();window._mc=true;}
+  if(id==='users'){loadUsers();}  // ← add this line
+  };
+
+  // Chart defaults
+  Chart.defaults.color = '#8890a4';
+  Chart.defaults.font = {family:"'DM Sans',sans-serif", size:11};
+
+  // SIGNUP CHART
+  const days30=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
+  let u=18;const signups=days30.map(()=>{u=Math.max(5,Math.round(u+(Math.random()-.4)*6));return u;});
+  new Chart(document.getElementById('signupChart'),{type:'bar',data:{labels:days30,datasets:[{data:signups,backgroundColor:'rgba(61,127,255,0.5)',borderRadius:3,hoverBackgroundColor:'rgba(61,127,255,0.8)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},scales:{x:{grid:{display:false,drawBorder:false},ticks:{maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.04)',drawBorder:false}}}}});
+
+  // API PIE CHART
+  new Chart(document.getElementById('apiChart'),{type:'doughnut',data:{labels:['Predictions','Market data','Portfolio'],datasets:[{data:[45,32,23],backgroundColor:['#3d7fff','#10c98a','#f5c542'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},cutout:'65%'}});
+
+  // MODEL CHART
+  function buildModelChart(){
+    const lbs=Array.from({length:12},(_,i)=>{const d=new Date();d.setMonth(d.getMonth()-11+i);return d.toLocaleDateString('en',{month:'short'});});
+    new Chart(document.getElementById('modelChart'),{type:'line',data:{labels:lbs,datasets:[{label:'v2.2',data:[68,69,70,71,70,72,73,72,74,73,74,74.2],borderColor:'#10c98a',borderWidth:2,pointRadius:2,tension:0.3,fill:false},{label:'v2.3β',data:[null,null,null,null,null,null,null,null,null,75,76,77.8],borderColor:'#f5c542',borderWidth:2,borderDash:[4,3],pointRadius:2,tension:0.3,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},scales:{x:{grid:{display:false,drawBorder:false},ticks:{font:{size:10}}},y:{min:65,grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},ticks:{callback:v=>v+'%'}}}}});
+  }
+
+  // USERS TABLE — load from backend
+  async function loadUsers() {
+  const token = localStorage.getItem('token');
+  if (!token) {
+    console.error('No token found in localStorage');
+    return;
+  }
+
+  try {
+    const res = await fetch('http://localhost:8000/auth/users', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+
+    console.log('Users API status:', res.status);
+
+    if (res.ok) {
+      const data = await res.json();
+      console.log('Users loaded:', data);
+      window._users = data;
+      renderUsers(data);
+      return;
+    } else {
+      const err = await res.json();
+      console.error('API error:', err);
+    }
+  } catch(e) {
+    console.error('Fetch failed:', e);
+  }
+
+  // Fallback demo data
+  window._users = [
+    {id:1,name:'Ram Thapa',email:'ram.thapa@gmail.com',role:'user',is_active:true,created_at:'2026-04-10'},
+    {id:2,name:'Sita Rai',email:'sita.rai@email.com',role:'user',is_active:true,created_at:'2026-04-12'},
+    {id:3,name:'Admin User',email:'admin@nepsera.com',role:'admin',is_active:true,created_at:'2026-04-01'},
+  ];
+  renderUsers(window._users);
+}
+
+  function renderUsers(list) {
+    document.getElementById('userTbody').innerHTML = list.map(u=>`<tr>
+      <td style="color:var(--text3);padding-left:20px;font-family:'JetBrains Mono',monospace;font-size:11px;">${u.id}</td>
+      <td style="font-weight:600;">${u.name}</td>
+      <td style="color:var(--text2);">${u.email}</td>
+      <td><span class="bdg ${u.role==='admin'?'bdg-a':'bdg-y'}">${u.role}</span></td>
+      <td><span class="bdg ${u.is_active?'bdg-g':'bdg-r'}">${u.is_active?'Active':'Suspended'}</span></td>
+      <td style="color:var(--text3);font-size:11px;">${u.created_at ? u.created_at.slice(0,10) : '—'}</td>
+      <td><button class="act-btn">Edit</button><button class="act-btn danger">Suspend</button></td>
+    </tr>`).join('');
+  }
+
+  window.filterUsers = function() {
+    const q = document.getElementById('userSearch').value.toLowerCase();
+    const r = document.getElementById('roleFilter').value;
+    const s = document.getElementById('statusFilter').value;
+    renderUsers((window._users||[]).filter(u =>
+      (!q || (u.name+u.email).toLowerCase().includes(q)) &&
+      (!r || u.role === r) &&
+      (!s || (s==='Active' ? u.is_active : !u.is_active))
+    ));
+  };
+})();
+</script>
+</body>
+</html>

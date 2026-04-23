@@ -105,7 +105,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);margin-top:6
   </div>
   <div class="topbar-right">
     <div class="mkt-badge">● Market Open</div>
-    <button class="btn-login">Sign In</button>
+    <button class="btn-login" id="authBtn">Sign In</button>
   </div>
 </div>
 
@@ -216,6 +216,55 @@ const tickerData=[{sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},{sym:'NICA',val
 const t=document.getElementById('ticker');
 const items=tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span style="color:var(--text)">${d.val}</span><span style="color:${d.up?'var(--green)':'var(--red)'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
 t.innerHTML=items+items;
+
+// Paste this in every page's <script> block
+function initAuth() {
+  const user = localStorage.getItem('nepseraUser');
+  const btn = document.getElementById('authBtn');
+  if (!btn) return;
+  if (user) {
+    btn.textContent = 'Logout';
+    btn.style.background = 'rgba(240,82,82,0.1)';
+    btn.style.borderColor = 'rgba(240,82,82,0.3)';
+    btn.style.color = 'var(--red)';
+    btn.onclick = () => {
+      localStorage.removeItem('nepseraUser');
+      location.reload();
+    };
+  } else {
+    btn.textContent = 'Sign In';
+    btn.style.background = 'rgba(61,127,255,0.1)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent2)';
+    btn.onclick = () => { window.location.href = 'signin.html'; };
+  }
+}
+function initAuth() {
+  const user = localStorage.getItem('nepseraUser');
+  const btn = document.getElementById('authBtn');
+
+  if (!btn) return;
+
+  if (user) {
+    btn.textContent = 'Logout';
+    btn.style.background = 'rgba(240,82,82,0.1)';
+    btn.style.borderColor = 'rgba(240,82,82,0.3)';
+    btn.style.color = 'var(--red)';
+    btn.onclick = () => {
+      localStorage.removeItem('nepseraUser');
+      location.reload();
+    };
+  } else {
+    btn.textContent = 'Sign In';
+    btn.style.background = 'rgba(61,127,255,0.1)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent2)';
+    btn.onclick = () => { window.location.href = 'signin.html'; };
+  }
+}
+
+// Call it — this was also missing!
+initAuth();
 </script>
 </body>
 </html>

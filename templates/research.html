@@ -104,7 +104,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);margin-top:6
   </div>
   <div class="topbar-right">
     <div class="mkt-badge">● Market Open</div>
-    <button class="btn-login">Sign In</button>
+    <button class="btn-login" id="authBtn">Sign In</button>
   </div>
 </div>
 
@@ -234,6 +234,56 @@ Chart.defaults.color='#8890a4';Chart.defaults.font={family:"'DM Sans',sans-serif
 const qLabels=['Q4 FY23','Q1 FY24','Q2 FY24','Q3 FY24','Q4 FY24','Q1 FY25','Q2 FY25','Q3 FY25'];
 const eps=[58,62,65,69,71,73,70,74];
 new Chart(document.getElementById('valChart'),{type:'bar',data:{labels:qLabels,datasets:[{data:eps,backgroundColor:'rgba(61,127,255,0.5)',borderRadius:3,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:8,callbacks:{label:ctx=>'EPS: NPR '+ctx.raw}}},scales:{x:{grid:{display:false},ticks:{font:{size:9},maxRotation:45}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{callback:v=>'₨'+v}}}}});
+
+// Paste this in every page's <script> block
+function initAuth() {
+  const user = localStorage.getItem('nepseraUser');
+  const btn = document.getElementById('authBtn');
+  if (!btn) return;
+  if (user) {
+    btn.textContent = 'Logout';
+    btn.style.background = 'rgba(240,82,82,0.1)';
+    btn.style.borderColor = 'rgba(240,82,82,0.3)';
+    btn.style.color = 'var(--red)';
+    btn.onclick = () => {
+      localStorage.removeItem('nepseraUser');
+      location.reload();
+    };
+  } else {
+    btn.textContent = 'Sign In';
+    btn.style.background = 'rgba(61,127,255,0.1)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent2)';
+    btn.onclick = () => { window.location.href = 'signin.html'; };
+  }
+}
+function initAuth() {
+  const user = localStorage.getItem('nepseraUser');
+  const btn = document.getElementById('authBtn');
+
+  if (!btn) return;
+
+  if (user) {
+    btn.textContent = 'Logout';
+    btn.style.background = 'rgba(240,82,82,0.1)';
+    btn.style.borderColor = 'rgba(240,82,82,0.3)';
+    btn.style.color = 'var(--red)';
+    btn.onclick = () => {
+      localStorage.removeItem('nepseraUser');
+      location.reload();
+    };
+  } else {
+    btn.textContent = 'Sign In';
+    btn.style.background = 'rgba(61,127,255,0.1)';
+    btn.style.borderColor = 'var(--accent)';
+    btn.style.color = 'var(--accent2)';
+    btn.onclick = () => { window.location.href = 'signin.html'; };
+  }
+}
+
+// Call it — this was also missing!
+initAuth();
+
 </script>
 </body>
 </html>

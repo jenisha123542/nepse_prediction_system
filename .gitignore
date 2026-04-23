@@ -1,54 +1,8 @@
-# ----------------------
-# Python environment
-# ----------------------
-venv/                     # virtual environment
-__pycache__/              # Python cache
-*.py[cod]                 # compiled Python files
-*.pyo                     # optimized Python files
-*.pyd                     # Windows Python DLLs
-
-# ----------------------
-# Environment files / Secrets
-# ----------------------
-.env                      # environment variables (DB_URL, SECRET_KEY)
-*.env.*                   # any other .env files
-
-# ----------------------
-# IDE / Editor files
-# ----------------------
-.vscode/                  # VSCode settings
-.idea/                    # PyCharm / IntelliJ settings
-*.sublime-project
-*.sublime-workspace
-
-# ----------------------
-# OS generated files
-# ----------------------
-.DS_Store                 # MacOS
-Thumbs.db                 # Windows
-
-# ----------------------
-# Jupyter / Notebook files
-# ----------------------
-.ipynb_checkpoints/       # checkpoints for notebooks
-
-# ----------------------
-# Data folders (raw, processed, stocks)
-# ----------------------
-data/raw/
-data/processed/
-data/stocks/
-
-# ----------------------
-# Logs / temp files
-# ----------------------
-*.log
-*.tmp
-*.bak
-
-# ----------------------
-# Frontend / static build files (optional)
-# ----------------------
-frontend/static/css/*.min.css
-frontend/static/js/*.min.js
-frontend/static/*.map
+venv/
+__pycache__/
+*.pyc
+*.pyd
+*.pyo
+.env
+*.db
+*.sqlite
