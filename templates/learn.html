@@ -233,46 +233,7 @@ footer{background:var(--surface);border-top:1px solid var(--border);margin-top:6
   </div>
 </footer>
 
-<script>
-const tickerData=[{sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},{sym:'NICA',val:'920',chg:'+1.32%',up:true},{sym:'BPCL',val:'595',chg:'+7.40%',up:true},{sym:'UPPER',val:'224',chg:'+9.80%',up:true},{sym:'SHPC',val:'388',chg:'-2.02%',up:false},{sym:'LICN',val:'1,197',chg:'-5.80%',up:false}];
-const t=document.getElementById('ticker');
-const items=tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span style="color:var(--text)">${d.val}</span><span style="color:${d.up?'var(--green)':'var(--red)'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
-t.innerHTML=items+items;
-
-function toggleFaq(el){
-  const item=el.parentElement;
-  const isOpen=item.classList.contains('open');
-  document.querySelectorAll('.faq-item').forEach(i=>i.classList.remove('open'));
-  if(!isOpen)item.classList.add('open');
-}
-
-// Paste this in every page's <script> block
-function initAuth() {
-  const user = localStorage.getItem('nepseraUser');
-  const btn = document.getElementById('authBtn');
-
-  if (!btn) return;
-
-  if (user) {
-    btn.textContent = 'Logout';
-    btn.style.background = 'rgba(240,82,82,0.1)';
-    btn.style.borderColor = 'rgba(240,82,82,0.3)';
-    btn.style.color = 'var(--red)';
-    btn.onclick = () => {
-      localStorage.removeItem('nepseraUser');
-      location.reload();
-    };
-  } else {
-    btn.textContent = 'Sign In';
-    btn.style.background = 'rgba(61,127,255,0.1)';
-    btn.style.borderColor = 'var(--accent)';
-    btn.style.color = 'var(--accent2)';
-    btn.onclick = () => { window.location.href = 'signin.html'; };
-  }
-}
-
-// Call it — this was also missing!
-initAuth();
-</script>
+<script src="../api.js"></script>
+<script src="shared.js"></script>
 </body>
 </html>

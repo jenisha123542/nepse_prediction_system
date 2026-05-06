@@ -6,6 +6,19 @@
 <title>Markets — NepSera</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="../api.js"></script>
+
+<script>
+  const API = {
+    overview: (date) => StockAPI.overview(date).then(r => r.ok ? r.data : null),
+    gainers:  (n)    => StockAPI.gainers(n).then(r => r.ok ? r.data : null),
+    losers:   (n)    => StockAPI.losers(n).then(r => r.ok ? r.data : null),
+    topVolume:(n)    => StockAPI.topVolume(n).then(r => r.ok ? r.data : null),
+    latestStocks:(n) => StockAPI.latestStocks(n).then(r => r.ok ? r.data : null),
+    summary:  (sym)  => StockAPI.summary(sym).then(r => r.ok ? r.data : null),
+    history:  (sym)  => StockAPI.history(sym).then(r => r.ok ? r.data : null),
+  };
+</script>
 <style>
 :root{--bg:#0b0e14;--surface:#111520;--surface2:#161c2a;--border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);--accent:#3d7fff;--accent2:#5b9bff;--green:#10c98a;--green-dim:rgba(16,201,138,0.12);--red:#f05252;--red-dim:rgba(240,82,82,0.12);--gold:#f5c542;--text:#e8eaf0;--text2:#8890a4;--text3:#545e75;--radius:14px;--radius-sm:8px;}
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -14,14 +27,14 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .ticker-wrap::before,.ticker-wrap::after{content:'';position:absolute;top:0;width:60px;height:100%;z-index:2;}
 .ticker-wrap::before{left:0;background:linear-gradient(to right,var(--surface),transparent);}
 .ticker-wrap::after{right:0;background:linear-gradient(to left,var(--surface),transparent);}
-.ticker{display:flex;animation:ticker 30s linear infinite;width:max-content;}
+.ticker{display:flex;animation:ticker 40s linear infinite;width:max-content;}
 .ticker-item{display:flex;align-items:center;gap:6px;padding:0 28px;font-size:12px;font-weight:500;white-space:nowrap;font-family:'JetBrains Mono',monospace;}
 .ticker-item .sym{color:var(--text2);}
 .ticker-sep{width:1px;height:14px;background:var(--border2);}
 @keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:10px 40px;border-bottom:1px solid var(--border);background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
 .logo-area{display:flex;align-items:center;gap:14px;}
-.logo-img{height:70px;width:auto;object-fit:contain;filter:brightness(1.1);}
+.logo-img{height:48px;width:auto;object-fit:contain;filter:brightness(1.1);}
 .logo-text{display:flex;flex-direction:column;}
 .logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.5px;line-height:1;}
 .logo-tagline{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
@@ -37,9 +50,10 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .btn-login{font-size:12px;font-weight:600;padding:7px 18px;border:1px solid var(--accent);border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);cursor:pointer;transition:all .2s;}
 .btn-login:hover{background:rgba(61,127,255,0.2);}
 .wrap{max-width:1280px;margin:0 auto;padding:32px 40px 60px;}
-.page-hero{margin-bottom:32px;}
 .page-title{font-family:'DM Serif Display',serif;font-size:34px;color:var(--text);letter-spacing:-.5px;margin-bottom:6px;}
-.page-sub{font-size:14px;color:var(--text3);}
+.page-sub{font-size:14px;color:var(--text3);margin-bottom:28px;}
+
+/* METRICS */
 .metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:28px;}
 .metric{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:16px 18px;position:relative;overflow:hidden;}
 .metric::after{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(61,127,255,0.3),transparent);}
@@ -47,20 +61,27 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .mval{font-size:20px;font-weight:700;font-family:'JetBrains Mono',monospace;}
 .mchg{font-size:12px;margin-top:6px;font-weight:500;}
 .up{color:var(--green);}.dn{color:var(--red);}
+
+/* LAYOUT */
 .g2{display:grid;grid-template-columns:1.6fr 1fr;gap:16px;margin-bottom:20px;}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:20px 22px;}
 .card-title{font-size:11px;font-weight:700;color:var(--text2);margin-bottom:16px;text-transform:uppercase;letter-spacing:.8px;display:flex;align-items:center;gap:8px;}
 .card-title::before{content:'';width:3px;height:13px;background:var(--accent);border-radius:2px;}
+
+/* TABLES */
 .tbl{width:100%;border-collapse:collapse;font-size:13px;}
 .tbl th{font-size:10px;color:var(--text3);font-weight:600;text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.5px;}
-.tbl td{padding:11px 10px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .15s;}
+.tbl td{padding:10px 10px;border-bottom:1px solid rgba(255,255,255,0.04);transition:background .15s;}
 .tbl tr:hover td{background:rgba(255,255,255,0.025);}
 .tbl tr:last-child td{border-bottom:none;}
 .bdg{display:inline-flex;align-items:center;font-size:11px;font-weight:600;padding:3px 8px;border-radius:5px;}
 .bdg-u{background:var(--green-dim);color:var(--green);border:1px solid rgba(16,201,138,0.2);}
 .bdg-d{background:var(--red-dim);color:var(--red);border:1px solid rgba(240,82,82,0.2);}
-.sec-pill{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border);}
+.sym-cell{font-weight:700;font-family:'JetBrains Mono',monospace;}
+.num-cell{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--text2);}
+
+/* SUB-INDICES */
 .idx-row{display:flex;align-items:center;justify-content:space-between;padding:13px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
 .idx-row:last-child{border-bottom:none;}
 .idx-name{font-size:13px;font-weight:600;}
@@ -68,16 +89,55 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .idx-val{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;text-align:right;}
 .mini-bar{height:3px;border-radius:2px;background:rgba(255,255,255,0.06);margin-top:5px;width:80px;}
 .mini-fill{height:100%;border-radius:2px;}
+
+/* SECTOR FILTER */
+.sec-pill{display:inline-block;font-size:11px;padding:3px 10px;border-radius:20px;background:rgba(255,255,255,0.05);color:var(--text2);border:1px solid var(--border);cursor:pointer;transition:all .2s;}
+.sec-pill:hover,.sec-pill.active{background:rgba(61,127,255,0.1);color:var(--accent2);border-color:rgba(61,127,255,0.3);}
+.filter-active{font-size:12px;padding:5px 14px;border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);border:1px solid rgba(61,127,255,0.25);cursor:pointer;font-weight:600;}
+
+/* SEARCH */
+.search-bar{display:flex;gap:10px;margin-bottom:16px;align-items:center;}
+.search-input{flex:1;background:var(--surface2);border:1px solid var(--border2);border-radius:8px;padding:8px 14px;color:var(--text);font-size:13px;font-family:'DM Sans',sans-serif;outline:none;transition:border-color .2s;}
+.search-input:focus{border-color:var(--accent);}
+.search-input::placeholder{color:var(--text3);}
+
+/* LOADING SKELETON */
+.skeleton{background:linear-gradient(90deg,var(--surface2) 25%,rgba(255,255,255,0.04) 50%,var(--surface2) 75%);background-size:200% 100%;animation:shimmer 1.4s infinite;border-radius:4px;height:14px;display:inline-block;}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* STOCK DETAIL MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);backdrop-filter:blur(6px);z-index:200;align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px;width:min(680px,95vw);max-height:85vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:16px;right:18px;background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;line-height:1;}
+.modal-close:hover{color:var(--text);}
+.modal-sym{font-family:'JetBrains Mono',monospace;font-size:28px;font-weight:700;color:var(--text);}
+.modal-price{font-family:'JetBrains Mono',monospace;font-size:36px;font-weight:700;margin:8px 0 4px;}
+.modal-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin:16px 0;}
+.modal-stat{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;}
+.ms-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;margin-bottom:4px;}
+.ms-val{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;}
+
 footer{background:var(--surface);border-top:1px solid var(--border);margin-top:60px;}
 .footer-bottom{max-width:1280px;margin:0 auto;padding:18px 40px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;}
 .footer-bottom-left{font-size:12px;color:var(--text3);}
-@media(max-width:900px){.metrics{grid-template-columns:1fr 1fr;}.g2,.g3{grid-template-columns:1fr;}.topbar{padding:10px 20px;}.wrap{padding:24px 20px 40px;}.nav-links{display:none;}}
+
+@media(max-width:900px){
+  .metrics{grid-template-columns:1fr 1fr;}
+  .g2,.g3{grid-template-columns:1fr;}
+  .topbar{padding:10px 20px;}
+  .wrap{padding:24px 20px 40px;}
+  .nav-links{display:none;}
+  .modal-grid{grid-template-columns:1fr 1fr;}
+}
 </style>
 </head>
 <body>
 
-<div class="ticker-wrap"><div class="ticker" id="ticker"></div></div>
+<!-- TICKER -->
+<div class="ticker-wrap"><div class="ticker" id="ticker"><span style="color:var(--text3);padding:0 20px;font-size:12px;">Loading market data...</span></div></div>
 
+<!-- TOPBAR -->
 <div class="topbar">
   <div class="logo-area">
     <img src="logo1.png" alt="NepSera" class="logo-img">
@@ -95,162 +155,443 @@ footer{background:var(--surface);border-top:1px solid var(--border);margin-top:6
     <a class="nav-link" href="index.html">Dashboard</a>
   </div>
   <div class="topbar-right">
-    <div class="mkt-badge">● Market Open</div>
+    <div class="mkt-badge" id="mktStatus">● Loading...</div>
     <button class="btn-login" id="authBtn">Sign In</button>
   </div>
 </div>
 
 <div class="wrap">
-  <div class="page-hero">
-    <div class="page-title">Markets</div>
-    <div class="page-sub">Live NEPSE data · All indices · Sector breakdown · Real-time movers</div>
-  </div>
+  <div class="page-title">Markets</div>
+  <div class="page-sub">Live NEPSE data · All indices · Sector breakdown · Real-time movers · <span id="dataDate" style="color:var(--accent2);"></span></div>
 
+  <!-- MARKET OVERVIEW METRICS -->
   <div class="metrics">
-    <div class="metric"><div class="mlabel">NEPSE Index</div><div class="mval">2,341.58</div><div class="mchg up">▲ 18.42 (0.79%)</div></div>
-    <div class="metric"><div class="mlabel">Sensitive Index</div><div class="mval">418.72</div><div class="mchg up">▲ 3.14 (0.76%)</div></div>
-    <div class="metric"><div class="mlabel">Float Index</div><div class="mval">164.38</div><div class="mchg up">▲ 1.92 (1.18%)</div></div>
-    <div class="metric"><div class="mlabel">Turnover</div><div class="mval">3.2B</div><div class="mchg up">▲ 12.4% vs prev</div></div>
-    <div class="metric"><div class="mlabel">Transactions</div><div class="mval">61,240</div><div class="mchg up">▲ 7.8%</div></div>
+    <div class="metric">
+      <div class="mlabel">Total Companies</div>
+      <div class="mval" id="m-companies"><span class="skeleton" style="width:60px;"></span></div>
+      <div class="mchg" style="color:var(--text3);">Listed on NEPSE</div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Total Volume</div>
+      <div class="mval" id="m-volume"><span class="skeleton" style="width:70px;"></span></div>
+      <div class="mchg up">Shares traded</div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Total Turnover</div>
+      <div class="mval" id="m-turnover"><span class="skeleton" style="width:80px;"></span></div>
+      <div class="mchg up" id="m-turnover-sub">Today</div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Gainers / Losers</div>
+      <div class="mval" id="m-gl"><span class="skeleton" style="width:70px;"></span></div>
+      <div class="mchg" id="m-unchanged" style="color:var(--text3);"></div>
+    </div>
+    <div class="metric">
+      <div class="mlabel">Transactions</div>
+      <div class="mval" id="m-tx"><span class="skeleton" style="width:60px;"></span></div>
+      <div class="mchg" style="color:var(--text3);">Total trades</div>
+    </div>
   </div>
 
-  <div class="g2">
-    <div class="card">
-      <div class="card-title">NEPSE Index — Live Chart</div>
-      <div style="height:240px;"><canvas id="idxChart"></canvas></div>
-    </div>
-    <div class="card">
-      <div class="card-title">Sub-Indices</div>
-      <div class="idx-row"><div><div class="idx-name">Banking</div><div class="idx-sub">27 companies</div></div><div><div class="idx-val up">1,184.3</div><div class="mini-bar"><div class="mini-fill" style="width:70%;background:var(--green);"></div></div></div></div>
-      <div class="idx-row"><div><div class="idx-name">Hydropower</div><div class="idx-sub">64 companies</div></div><div><div class="idx-val up">2,847.6</div><div class="mini-bar"><div class="mini-fill" style="width:85%;background:var(--green);"></div></div></div></div>
-      <div class="idx-row"><div><div class="idx-name">Insurance</div><div class="idx-sub">19 companies</div></div><div><div class="idx-val dn">6,312.1</div><div class="mini-bar"><div class="mini-fill" style="width:40%;background:var(--red);"></div></div></div></div>
-      <div class="idx-row"><div><div class="idx-name">Finance</div><div class="idx-sub">17 companies</div></div><div><div class="idx-val up">734.9</div><div class="mini-bar"><div class="mini-fill" style="width:55%;background:var(--green);"></div></div></div></div>
-      <div class="idx-row"><div><div class="idx-name">Manufacturing</div><div class="idx-sub">22 companies</div></div><div><div class="idx-val dn">3,108.4</div><div class="mini-bar"><div class="mini-fill" style="width:30%;background:var(--red);"></div></div></div></div>
-    </div>
-  </div>
-
+  <!-- TOP 3 CARDS -->
   <div class="g3">
     <div class="card">
       <div class="card-title">Top Gainers</div>
-      <table class="tbl"><thead><tr><th>Symbol</th><th>LTP</th><th>Change</th></tr></thead><tbody>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">UPPER</td><td style="font-family:'JetBrains Mono',monospace;">224</td><td><span class="bdg bdg-u">+9.9%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">BPCL</td><td style="font-family:'JetBrains Mono',monospace;">595</td><td><span class="bdg bdg-u">+7.2%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NHPC</td><td style="font-family:'JetBrains Mono',monospace;">318</td><td><span class="bdg bdg-u">+5.8%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">SBI</td><td style="font-family:'JetBrains Mono',monospace;">412</td><td><span class="bdg bdg-u">+4.4%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NABIL</td><td style="font-family:'JetBrains Mono',monospace;">1,363</td><td><span class="bdg bdg-u">+1.6%</span></td></tr>
-      </tbody></table>
+      <table class="tbl">
+        <thead><tr><th>Symbol</th><th>LTP</th><th>Change</th></tr></thead>
+        <tbody id="gainers-body">
+          <tr><td colspan="3" style="text-align:center;color:var(--text3);padding:20px;">Loading...</td></tr>
+        </tbody>
+      </table>
     </div>
     <div class="card">
       <div class="card-title">Top Losers</div>
-      <table class="tbl"><thead><tr><th>Symbol</th><th>LTP</th><th>Change</th></tr></thead><tbody>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">LICN</td><td style="font-family:'JetBrains Mono',monospace;">1,197</td><td><span class="bdg bdg-d">-5.8%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">ADBL</td><td style="font-family:'JetBrains Mono',monospace;">376</td><td><span class="bdg bdg-d">-4.1%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NGPL</td><td style="font-family:'JetBrains Mono',monospace;">854</td><td><span class="bdg bdg-d">-3.3%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">PRVU</td><td style="font-family:'JetBrains Mono',monospace;">281</td><td><span class="bdg bdg-d">-2.7%</span></td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">SHINE</td><td style="font-family:'JetBrains Mono',monospace;">143</td><td><span class="bdg bdg-d">-1.9%</span></td></tr>
-      </tbody></table>
+      <table class="tbl">
+        <thead><tr><th>Symbol</th><th>LTP</th><th>Change</th></tr></thead>
+        <tbody id="losers-body">
+          <tr><td colspan="3" style="text-align:center;color:var(--text3);padding:20px;">Loading...</td></tr>
+        </tbody>
+      </table>
     </div>
     <div class="card">
       <div class="card-title">Most Active</div>
-      <table class="tbl"><thead><tr><th>Symbol</th><th>Volume</th><th>Turnover</th></tr></thead><tbody>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NABIL</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">1.8M</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">245M</td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">UPPER</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">1.2M</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">269M</td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NICA</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">980K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">902M</td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">ADBL</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">510K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">192M</td></tr>
-        <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">BPCL</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">840K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">500M</td></tr>
-      </tbody></table>
+      <table class="tbl">
+        <thead><tr><th>Symbol</th><th>Volume</th><th>Turnover</th></tr></thead>
+        <tbody id="active-body">
+          <tr><td colspan="3" style="text-align:center;color:var(--text3);padding:20px;">Loading...</td></tr>
+        </tbody>
+      </table>
     </div>
   </div>
 
+  <!-- ALL SECURITIES TABLE -->
   <div class="card">
     <div class="card-title">All Listed Securities</div>
-    <div style="display:flex;gap:8px;margin-bottom:16px;flex-wrap:wrap;">
-      <span style="font-size:12px;padding:5px 14px;border-radius:20px;background:rgba(61,127,255,0.1);color:var(--accent2);border:1px solid rgba(61,127,255,0.25);cursor:pointer;font-weight:600;">All</span>
-      <span class="sec-pill" style="cursor:pointer;">Banking</span>
-      <span class="sec-pill" style="cursor:pointer;">Hydropower</span>
-      <span class="sec-pill" style="cursor:pointer;">Insurance</span>
-      <span class="sec-pill" style="cursor:pointer;">Finance</span>
-      <span class="sec-pill" style="cursor:pointer;">Manufacturing</span>
-      <span class="sec-pill" style="cursor:pointer;">Hotels</span>
-      <span class="sec-pill" style="cursor:pointer;">Others</span>
+    <div class="search-bar">
+      <input class="search-input" id="searchInput" type="text" placeholder="Search by symbol or company...">
+      <div style="display:flex;gap:6px;flex-wrap:wrap;" id="filterBtns">
+        <span class="filter-active" onclick="filterSector('ALL',this)">All</span>
+      </div>
     </div>
-    <table class="tbl"><thead><tr><th>Symbol</th><th>Company</th><th>Sector</th><th>LTP (NPR)</th><th>Change</th><th>Volume</th><th>Turnover</th><th>52W High</th><th>52W Low</th></tr></thead><tbody>
-      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NABIL</td><td style="color:var(--text2);">Nabil Bank Ltd.</td><td><span class="sec-pill">Banking</span></td><td style="font-family:'JetBrains Mono',monospace;">1,363</td><td><span class="bdg bdg-u">+1.64%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">310K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">422M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">1,580</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">1,090</td></tr>
-      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">NICA</td><td style="color:var(--text2);">NIC Asia Bank</td><td><span class="sec-pill">Banking</span></td><td style="font-family:'JetBrains Mono',monospace;">920</td><td><span class="bdg bdg-u">+1.32%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">980K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">902M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">1,140</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">748</td></tr>
-      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">BPCL</td><td style="color:var(--text2);">Butwal Power Co.</td><td><span class="sec-pill">Hydropower</span></td><td style="font-family:'JetBrains Mono',monospace;">595</td><td><span class="bdg bdg-u">+7.40%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">840K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">500M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">680</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">410</td></tr>
-      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">UPPER</td><td style="color:var(--text2);">Upper Tamakoshi Hydro</td><td><span class="sec-pill">Hydropower</span></td><td style="font-family:'JetBrains Mono',monospace;">224</td><td><span class="bdg bdg-u">+9.80%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">1.2M</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">269M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">296</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">148</td></tr>
-      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">LICN</td><td style="color:var(--text2);">Life Insurance Corp. Nepal</td><td><span class="sec-pill">Insurance</span></td><td style="font-family:'JetBrains Mono',monospace;">1,197</td><td><span class="bdg bdg-d">-5.80%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">280K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">335M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">1,540</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">980</td></tr>
-      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">ADBL</td><td style="color:var(--text2);">Agricultural Dev. Bank</td><td><span class="sec-pill">Banking</span></td><td style="font-family:'JetBrains Mono',monospace;">376</td><td><span class="bdg bdg-d">-4.10%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">510K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">192M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">498</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">290</td></tr>
-      <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;">SHPC</td><td style="color:var(--text2);">Sanima Hydropower</td><td><span class="sec-pill">Hydropower</span></td><td style="font-family:'JetBrains Mono',monospace;">388</td><td><span class="bdg bdg-d">-2.02%</span></td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">420K</td><td style="color:var(--text2);font-family:'JetBrains Mono',monospace;font-size:12px;">163M</td><td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">472</td><td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">298</td></tr>
-    </tbody></table>
+    <div style="overflow-x:auto;">
+      <table class="tbl">
+        <thead>
+          <tr>
+            <th>Symbol</th>
+            <th>Close (NPR)</th>
+            <th>LTP</th>
+            <th>Change %</th>
+            <th>Volume</th>
+            <th>Turnover</th>
+            <th>52W High</th>
+            <th>52W Low</th>
+            <th>VWAP</th>
+          </tr>
+        </thead>
+        <tbody id="all-stocks-body">
+          <tr><td colspan="9" style="text-align:center;color:var(--text3);padding:30px;">Loading all securities...</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div style="font-size:12px;color:var(--text3);margin-top:12px;" id="stockCount"></div>
+  </div>
+</div>
+
+<!-- STOCK DETAIL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModal(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="document.getElementById('modalOverlay').classList.remove('open')">✕</button>
+    <div id="modal-sym" class="modal-sym"></div>
+    <div id="modal-price" class="modal-price"></div>
+    <div id="modal-chg"></div>
+    <div class="modal-grid" id="modal-grid"></div>
+    <div style="height:200px;margin-top:8px;"><canvas id="modalChart"></canvas></div>
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;text-align:center;">Historical close price — last 90 days</div>
   </div>
 </div>
 
 <footer>
   <div class="footer-bottom">
-    <div class="footer-bottom-left">© 2025 NepSera Technologies Pvt. Ltd. · Kathmandu, Nepal · Data is for informational purposes only.</div>
+    <div class="footer-bottom-left">© 2025 NepSera Technologies Pvt. Ltd. · Data sourced from your NEPSE database · For informational purposes only.</div>
     <div style="font-size:12px;color:var(--text3);">Data Partners: NEPSE · SEBON · NRB</div>
   </div>
 </footer>
 
 <script>
-const tickerData=[{sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},{sym:'NICA',val:'920',chg:'+1.32%',up:true},{sym:'BPCL',val:'595',chg:'+7.40%',up:true},{sym:'UPPER',val:'224',chg:'+9.80%',up:true},{sym:'SHPC',val:'388',chg:'-2.02%',up:false},{sym:'LICN',val:'1,197',chg:'-5.80%',up:false},{sym:'ADBL',val:'376',chg:'-4.10%',up:false},{sym:'SBI',val:'412',chg:'+4.40%',up:true}];
-const t=document.getElementById('ticker');
-const items=tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span style="color:var(--text)">${d.val}</span><span style="color:${d.up?'var(--green)':'var(--red)'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
-t.innerHTML=items+items;
-const days30=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
-let b=2200;const idxD=days30.map(()=>{b+=4+(Math.random()-.38)*20;return Math.round(b);});idxD[29]=2341;
-Chart.defaults.color='#8890a4';Chart.defaults.font={family:"'DM Sans',sans-serif",size:11};
-new Chart(document.getElementById('idxChart'),{type:'line',data:{labels:days30,datasets:[{data:idxD,borderColor:'#3d7fff',borderWidth:2,fill:true,backgroundColor:(ctx)=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,220);g.addColorStop(0,'rgba(61,127,255,0.18)');g.addColorStop(1,'rgba(61,127,255,0)');return g;},pointRadius:0,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{callback:v=>v.toLocaleString()}}}}});
+Chart.defaults.color = '#8890a4';
+Chart.defaults.font = { family: "'DM Sans',sans-serif", size: 11 };
 
-// Paste this in every page's <script> block
+let allStocksData = [];
+let currentFilter = 'ALL';
+let modalChartInstance = null;
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+async function init() {
+  await Promise.all([
+    loadOverview(),
+    loadGainers(),
+    loadLosers(),
+    loadTopVolume(),
+    loadAllStocks(),
+  ]);
+  initAuth();
+}
+
+// ── OVERVIEW METRICS ──────────────────────────────────────────────────────────
+async function loadOverview() {
+  const data = await API.overview();
+  if (!data || !data.overview) return;
+  const o = data.overview;
+
+  document.getElementById('dataDate').textContent =
+    'Data as of: ' + (o.trade_date || '');
+  document.getElementById('m-companies').textContent =
+    o.total_stocks || '—';
+  document.getElementById('m-volume').textContent =
+    fmtVol(o.total_volume);
+  document.getElementById('m-turnover').textContent =
+    fmtTurnover(o.total_turnover);
+  document.getElementById('m-tx').textContent =
+    Number(o.total_stocks || 0).toLocaleString();
+
+  const gainers = o.gainers || 0;
+  const losers  = o.losers  || 0;
+  const unchanged = o.unchanged || 0;
+  document.getElementById('m-gl').innerHTML =
+    `<span class="up">${gainers}</span> / <span class="dn">${losers}</span>`;
+  document.getElementById('m-unchanged').textContent =
+    `${unchanged} unchanged`;
+
+  // Market status badge
+  const badge = document.getElementById('mktStatus');
+  badge.textContent = '● Market Data Loaded';
+}
+
+// ── GAINERS TABLE ─────────────────────────────────────────────────────────────
+async function loadGainers() {
+  const data = await API.gainers(8);
+  if (!data || !data.gainers) return;
+  const tbody = document.getElementById('gainers-body');
+  if (!data.gainers.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text3);text-align:center;padding:16px;">No data</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.gainers.map(r => `
+    <tr style="cursor:pointer;" onclick="openModal('${r.symbol}')">
+      <td class="sym-cell">${r.symbol}</td>
+      <td style="font-family:'JetBrains Mono',monospace;">${fmt(r.close)}</td>
+      <td>${badgeHtml(r.diff_pct)}</td>
+    </tr>`).join('');
+}
+
+// ── LOSERS TABLE ──────────────────────────────────────────────────────────────
+async function loadLosers() {
+  const data = await API.losers(8);
+  if (!data || !data.losers) return;
+  const tbody = document.getElementById('losers-body');
+  if (!data.losers.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text3);text-align:center;padding:16px;">No data</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.losers.map(r => `
+    <tr style="cursor:pointer;" onclick="openModal('${r.symbol}')">
+      <td class="sym-cell">${r.symbol}</td>
+      <td style="font-family:'JetBrains Mono',monospace;">${fmt(r.close)}</td>
+      <td>${badgeHtml(r.diff_pct)}</td>
+    </tr>`).join('');
+}
+
+// ── TOP VOLUME TABLE ──────────────────────────────────────────────────────────
+async function loadTopVolume() {
+  const data = await API.topVolume(8);
+  if (!data || !data.top_volume) return;
+  const tbody = document.getElementById('active-body');
+  if (!data.top_volume.length) {
+    tbody.innerHTML = '<tr><td colspan="3" style="color:var(--text3);text-align:center;padding:16px;">No data</td></tr>';
+    return;
+  }
+  tbody.innerHTML = data.top_volume.map(r => `
+    <tr style="cursor:pointer;" onclick="openModal('${r.symbol}')">
+      <td class="sym-cell">${r.symbol}</td>
+      <td class="num-cell">${fmtVol(r.volume)}</td>
+      <td class="num-cell">${fmtTurnover(r.turnover)}</td>
+    </tr>`).join('');
+}
+
+// ── ALL STOCKS TABLE ──────────────────────────────────────────────────────────
+async function loadAllStocks() {
+  const data = await API.latestStocks(500);
+  if (!data || !data.data) return;
+  allStocksData = data.data;
+
+  // Build ticker from real data
+  buildTicker(allStocksData);
+
+  renderAllStocks(allStocksData);
+}
+
+function renderAllStocks(stocks) {
+  const tbody = document.getElementById('all-stocks-body');
+  document.getElementById('stockCount').textContent =
+    `Showing ${stocks.length} securities`;
+
+  if (!stocks.length) {
+    tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--text3);padding:30px;">No securities found</td></tr>';
+    return;
+  }
+
+  tbody.innerHTML = stocks.map(r => {
+    const pct = Number(r.diff_pct || 0);
+    const pctClass = pct >= 0 ? 'up' : 'dn';
+    const sign = pct >= 0 ? '+' : '';
+    return `
+    <tr style="cursor:pointer;" onclick="openModal('${r.symbol}')">
+      <td class="sym-cell">${r.symbol}</td>
+      <td style="font-family:'JetBrains Mono',monospace;">${fmt(r.close)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;">${fmt(r.ltp)}</td>
+      <td><span class="${pctClass}" style="font-weight:600;font-size:13px;">${sign}${pct.toFixed(2)}%</span></td>
+      <td class="num-cell">${fmtVol(r.volume)}</td>
+      <td class="num-cell">${fmtTurnover(r.turnover)}</td>
+      <td style="color:var(--green);font-family:'JetBrains Mono',monospace;font-size:12px;">${fmt(r.weeks_52_high)}</td>
+      <td style="color:var(--red);font-family:'JetBrains Mono',monospace;font-size:12px;">${fmt(r.weeks_52_low)}</td>
+      <td class="num-cell">${fmt(r.vwap)}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── SEARCH ────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('searchInput').addEventListener('input', function() {
+    const q = this.value.trim().toUpperCase();
+    let filtered = allStocksData;
+    if (currentFilter !== 'ALL') {
+      // sector filtering not in DB yet — just filter by symbol prefix if needed
+    }
+    if (q) {
+      filtered = filtered.filter(s => s.symbol.includes(q));
+    }
+    renderAllStocks(filtered);
+  });
+});
+
+function filterSector(sector, btn) {
+  currentFilter = sector;
+  document.querySelectorAll('#filterBtns span, #filterBtns .sec-pill')
+    .forEach(b => { b.className = 'sec-pill'; });
+  btn.className = 'filter-active';
+  const q = document.getElementById('searchInput').value.trim().toUpperCase();
+  let filtered = allStocksData;
+  if (q) filtered = filtered.filter(s => s.symbol.includes(q));
+  renderAllStocks(filtered);
+}
+
+// ── TICKER (REAL DATA) ────────────────────────────────────────────────────────
+function buildTicker(stocks) {
+  const t = document.getElementById('ticker');
+  // pick top 20 by volume for ticker
+  const top = [...stocks]
+    .sort((a, b) => Number(b.volume || 0) - Number(a.volume || 0))
+    .slice(0, 20);
+
+  const makeItems = () => top.map(d => {
+    const pct = Number(d.diff_pct || 0);
+    const sign = pct >= 0 ? '+' : '';
+    const col = pct >= 0 ? 'var(--green)' : 'var(--red)';
+    return `
+      <div class="ticker-item">
+        <span class="sym">${d.symbol}</span>
+        <span style="color:var(--text)">${fmt(d.close, 0)}</span>
+        <span style="color:${col}">${sign}${pct.toFixed(2)}%</span>
+      </div>
+      <div class="ticker-sep"></div>`;
+  }).join('');
+
+  t.innerHTML = makeItems() + makeItems();
+}
+
+// ── STOCK DETAIL MODAL ────────────────────────────────────────────────────────
+async function openModal(symbol) {
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.add('open');
+
+  // Reset
+  document.getElementById('modal-sym').textContent = symbol;
+  document.getElementById('modal-price').textContent = 'Loading...';
+  document.getElementById('modal-chg').textContent = '';
+  document.getElementById('modal-grid').innerHTML = '';
+
+  // Fetch summary + history in parallel
+  const [sumData, histData] = await Promise.all([
+    API.summary(symbol),
+    API.history(symbol),
+  ]);
+
+  if (!sumData) {
+    document.getElementById('modal-price').textContent = 'Error loading data';
+    return;
+  }
+
+  const s = sumData.summary;
+  const l = sumData.latest;
+
+  // Price + change
+  const pct = Number(l?.diff_pct || 0);
+  const sign = pct >= 0 ? '+' : '';
+  const col = pct >= 0 ? 'var(--green)' : 'var(--red)';
+  document.getElementById('modal-price').textContent = 'NPR ' + fmt(l?.close);
+  document.getElementById('modal-price').style.color = col;
+  document.getElementById('modal-chg').innerHTML =
+    `<span style="color:${col};font-size:15px;font-weight:600;">${sign}${pct.toFixed(2)}% today</span>
+     <span style="color:var(--text3);font-size:12px;margin-left:12px;">${l?.trade_date || ''}</span>`;
+
+  // Stats grid
+  document.getElementById('modal-grid').innerHTML = `
+    <div class="modal-stat"><div class="ms-label">52W High</div><div class="ms-val" style="color:var(--green);">${fmt(s.weeks_52_high)}</div></div>
+    <div class="modal-stat"><div class="ms-label">52W Low</div><div class="ms-val" style="color:var(--red);">${fmt(s.weeks_52_low)}</div></div>
+    <div class="modal-stat"><div class="ms-label">Avg Close</div><div class="ms-val">${fmt(s.avg_close)}</div></div>
+    <div class="modal-stat"><div class="ms-label">Avg Volume</div><div class="ms-val">${fmtVol(s.avg_volume)}</div></div>
+    <div class="modal-stat"><div class="ms-label">Trading Days</div><div class="ms-val">${s.trading_days}</div></div>
+    <div class="modal-stat"><div class="ms-label">Total Turnover</div><div class="ms-val" style="font-size:13px;">${fmtTurnover(s.total_turnover)}</div></div>
+  `;
+
+  // History chart
+  if (histData && histData.data && histData.data.length) {
+    const recent = histData.data.slice(-90);
+    const labels = recent.map(r => r.trade_date);
+    const closes = recent.map(r => Number(r.close));
+
+    if (modalChartInstance) modalChartInstance.destroy();
+    modalChartInstance = new Chart(document.getElementById('modalChart'), {
+      type: 'line',
+      data: {
+        labels,
+        datasets: [{
+          data: closes,
+          borderColor: pct >= 0 ? '#10c98a' : '#f05252',
+          borderWidth: 2,
+          fill: true,
+          backgroundColor: (ctx) => {
+            const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 180);
+            g.addColorStop(0, pct >= 0 ? 'rgba(16,201,138,0.15)' : 'rgba(240,82,82,0.15)');
+            g.addColorStop(1, 'rgba(0,0,0,0)');
+            return g;
+          },
+          pointRadius: 0,
+          tension: 0.4,
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            mode: 'index',
+            intersect: false,
+            backgroundColor: 'rgba(17,21,32,0.95)',
+            borderColor: 'rgba(255,255,255,0.1)',
+            borderWidth: 1,
+            padding: 10,
+            callbacks: { label: ctx => 'NPR ' + fmt(ctx.raw) }
+          }
+        },
+        scales: {
+          x: { grid: { display: false }, ticks: { maxTicksLimit: 6 } },
+          y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { callback: v => fmt(v, 0) } }
+        }
+      }
+    });
+  }
+}
+
+function closeModal(e) {
+  if (e.target.id === 'modalOverlay') {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+}
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
 function initAuth() {
   const user = localStorage.getItem('nepseraUser');
   const btn = document.getElementById('authBtn');
   if (!btn) return;
   if (user) {
-    btn.textContent = 'Logout';
-    btn.style.background = 'rgba(240,82,82,0.1)';
-    btn.style.borderColor = 'rgba(240,82,82,0.3)';
-    btn.style.color = 'var(--red)';
+    const parsed = JSON.parse(user);
+    btn.textContent = '👤 ' + (parsed.name || 'Account');
+    btn.style.background = 'rgba(16,201,138,0.1)';
+    btn.style.borderColor = 'rgba(16,201,138,0.3)';
+    btn.style.color = 'var(--green)';
     btn.onclick = () => {
-      localStorage.removeItem('nepseraUser');
-      location.reload();
+      if (confirm('Sign out?')) { localStorage.removeItem('nepseraUser'); location.reload(); }
     };
   } else {
     btn.textContent = 'Sign In';
-    btn.style.background = 'rgba(61,127,255,0.1)';
-    btn.style.borderColor = 'var(--accent)';
-    btn.style.color = 'var(--accent2)';
-    btn.onclick = () => { window.location.href = 'signin.html'; };
-  }
-}
-function initAuth() {
-  const user = localStorage.getItem('nepseraUser');
-  const btn = document.getElementById('authBtn');
-
-  if (!btn) return;
-
-  if (user) {
-    btn.textContent = 'Logout';
-    btn.style.background = 'rgba(240,82,82,0.1)';
-    btn.style.borderColor = 'rgba(240,82,82,0.3)';
-    btn.style.color = 'var(--red)';
-    btn.onclick = () => {
-      localStorage.removeItem('nepseraUser');
-      location.reload();
-    };
-  } else {
-    btn.textContent = 'Sign In';
-    btn.style.background = 'rgba(61,127,255,0.1)';
-    btn.style.borderColor = 'var(--accent)';
-    btn.style.color = 'var(--accent2)';
     btn.onclick = () => { window.location.href = 'signin.html'; };
   }
 }
 
-// Call it — this was also missing!
-initAuth();
+// ── START ─────────────────────────────────────────────────────────────────────
+init();
 </script>
 </body>
 </html>
