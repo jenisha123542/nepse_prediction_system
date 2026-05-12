@@ -685,6 +685,29 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
 </div>
 
+<!-- Stock Detail Modal -->
+<div class="modal-overlay" id="stockDetailModal">
+  <div class="modal" style="max-width: 700px; max-height: 85vh; overflow-y: auto;">
+    <div class="modal-title">
+      <span id="stockDetailTitle">Stock Details</span>
+      <button class="modal-close" data-close="stockDetailModal">✕</button>
+    </div>
+    
+    <div id="stockDetailContent">
+      <!-- Loading state -->
+      <div style="text-align: center; padding: 40px;">
+        <div class="spinner"></div>
+        <p style="margin-top: 12px; color: var(--text3);">Loading stock details...</p>
+      </div>
+    </div>
+    
+    <div class="modal-footer">
+      <button class="act-btn" data-close="stockDetailModal">Close</button>
+      <button class="add-btn green" id="detailViewHistoryBtn" onclick="event.stopPropagation();">📈 View Full History</button>
+    </div>
+  </div>
+</div>
+
 <!-- ═══════════ USER MODALS ═══════════ -->
 <div class="modal-overlay" id="userModal">
   <div class="modal">
@@ -896,6 +919,18 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('sectorFilter').addEventListener('change', filterStocks);
   document.getElementById('stockStatusFilter').addEventListener('change', filterStocks);
 
+      document.getElementById('stockSearch').addEventListener('input', (e) => {
+      console.log('Search input changed:', e.target.value);
+      filterStocks();
+    });
+    document.getElementById('sectorFilter').addEventListener('change', (e) => {
+      console.log('Sector changed:', e.target.value);
+      filterStocks();
+    });
+    document.getElementById('stockStatusFilter').addEventListener('change', (e) => {
+      console.log('Status changed:', e.target.value);
+      filterStocks();
+    });
   // Stock buttons
   document.getElementById('addStockBtn').addEventListener('click', openAddStockModal);
   document.getElementById('syncStockBtn').addEventListener('click', syncStockData);
@@ -1312,32 +1347,66 @@ function statusBadge(s) {
 }
 
 function renderStocks(list) {
-  if (!list || !list.length) {
-    document.getElementById('stockTbody').innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="es-icon">📊</div><p>No stocks found.</p></div></td></tr>';
-    document.getElementById('stockCount').textContent = 'Showing 0 stocks'; return;
+  console.log('renderStocks() called with', list.length, 'stocks');
+  
+  const tbody = document.getElementById('stockTbody');
+  if (!tbody) {
+    console.error('stockTbody element not found!');
+    return;
   }
+  
+  if (!list || !list.length) {
+    tbody.innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="es-icon">📊</div><p>No stocks found.</p></div></td></tr>';
+    document.getElementById('stockCount').textContent = 'Showing 0 stocks';
+    return;
+  }
+  
   document.getElementById('stockCount').textContent = `Showing ${list.length} stock${list.length !== 1 ? 's' : ''}`;
-  document.getElementById('stockTbody').innerHTML = list.map(s => {
+  
+  tbody.innerHTML = list.map(s => {
     const chg = parseFloat(s.change_pct) || 0;
     const chgColor = chg > 0 ? 'var(--green)' : chg < 0 ? 'var(--red)' : 'var(--text2)';
     const chgArrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '';
-    return `<tr>
-      <td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;color:var(--accent2);">${s.symbol}</td>
-      <td style="color:var(--text2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${s.company}">${s.company}</td>
-      <td style="color:var(--text3);">${s.sector || '—'}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-weight:600;">${fmtNum(s.ltp, 2)}</td>
-      <td style="font-family:'JetBrains Mono',monospace;color:${chgColor};">${chgArrow} ${Math.abs(chg).toFixed(2)}%</td>
-      <td style="font-family:'JetBrains Mono',monospace;color:var(--green);">${fmtNum(s.high_52w, 2)}</td>
-      <td style="font-family:'JetBrains Mono',monospace;color:var(--red);">${fmtNum(s.low_52w, 2)}</td>
-      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">${s.volume ? fmtNum(s.volume) : '—'}</td>
-      <td>${statusBadge(s.status || 'live')}</td>
-      <td style="white-space:nowrap;">
-        <button class="act-btn" onclick="openEditStockModal(${s.id})">Edit</button>
-        <button class="act-btn" onclick="openHistoryModal('${s.symbol}')">History</button>
-        <button class="act-btn danger" onclick="openDeleteConfirm(${s.id},'${s.symbol}')">Delete</button>
-      </td>
-    </tr>`;
+    
+    return `
+      <tr data-stock-id="${s.id}" data-stock-symbol="${s.symbol}" class="clickable-stock" style="cursor: pointer; transition: background 0.2s;">
+        <td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;color:var(--accent2);">${s.symbol || '—'}</td>
+        <td style="color:var(--text2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${s.company || ''}">${s.company || '—'}</td>
+        <td style="color:var(--text3);">${s.sector || '—'}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-weight:600;">${fmtNum(s.ltp, 2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;color:${chgColor};">${chgArrow} ${Math.abs(chg).toFixed(2)}%</td>
+        <td style="font-family:'JetBrains Mono',monospace;color:var(--green);">${fmtNum(s.high_52w, 2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;color:var(--red);">${fmtNum(s.low_52w, 2)}</td>
+        <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">${s.volume ? fmtNum(s.volume) : '—'}</td>
+        <td>${statusBadge(s.status || 'live')}</td>
+        <td style="white-space:nowrap;">
+          <button class="act-btn" onclick="event.stopPropagation(); openEditStockModal(${s.id})">✏️ Edit</button>
+          <button class="act-btn" onclick="event.stopPropagation(); openHistoryModal('${s.symbol}')">📊 History</button>
+          <button class="act-btn danger" onclick="event.stopPropagation(); openDeleteConfirm(${s.id},'${s.symbol}')">🗑️ Delete</button>
+        </td>
+      </tr>
+    `;
   }).join('');
+  
+  // Add click event listeners to all clickable rows
+  document.querySelectorAll('.clickable-stock').forEach(row => {
+    row.addEventListener('click', (e) => {
+      // Don't trigger if clicking on buttons
+      if (!e.target.closest('.act-btn')) {
+        const stockId = row.dataset.stockId;
+        const stockSymbol = row.dataset.stockSymbol;
+        openStockDetailModal(stockId, stockSymbol);
+      }
+    });
+    
+    // Add hover effect
+    row.addEventListener('mouseenter', () => {
+      row.style.backgroundColor = 'rgba(61, 127, 255, 0.05)';
+    });
+    row.addEventListener('mouseleave', () => {
+      row.style.backgroundColor = '';
+    });
+  });
 }
 
 function filterStocks() {
@@ -1634,6 +1703,187 @@ function openHistoryModal(symbol) {
     }
   });
   openModal('historyModal');
+}
+
+function openStockDetailModal(stockId, stockSymbol) {
+  console.log('Opening detail for:', stockSymbol, '(ID:', stockId + ')');
+  
+  // Find the stock in your data
+  const stock = _stocks.find(s => s.id == stockId);
+  if (!stock) {
+    showToast('Stock not found', 'error');
+    return;
+  }
+  
+  // Update modal title
+  document.getElementById('stockDetailTitle').innerHTML = `${stock.symbol} - ${stock.company}`;
+  
+  // Generate detail content
+  const content = `
+    <div style="display: grid; gap: 20px;">
+      <!-- Quick Stats Grid -->
+      <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
+        <div class="metric" style="padding: 12px; margin: 0;">
+          <div class="mlabel">Last Traded Price</div>
+          <div class="mval" style="font-size: 28px; color: var(--accent2);">${fmtNum(stock.ltp, 2)}</div>
+          <div class="mchg ${stock.change_pct >= 0 ? 'up' : 'dn'}">
+            ${stock.change_pct >= 0 ? '▲' : '▼'} ${Math.abs(stock.change_pct || 0).toFixed(2)}%
+          </div>
+        </div>
+        <div class="metric" style="padding: 12px; margin: 0;">
+          <div class="mlabel">Volume</div>
+          <div class="mval">${fmtNum(stock.volume)}</div>
+          <div class="mchg">shares traded</div>
+        </div>
+        <div class="metric" style="padding: 12px; margin: 0;">
+          <div class="mlabel">Market Cap</div>
+          <div class="mval">${stock.market_cap ? 'रू ' + fmtNum(stock.market_cap, 0) : '—'}</div>
+          <div class="mchg">in Crores</div>
+        </div>
+      </div>
+      
+      <!-- Price Range -->
+      <div class="card" style="margin: 0; padding: 16px;">
+        <div class="card-title">52-Week Range</div>
+        <div style="margin-top: 12px;">
+          <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 12px; color: var(--red);">Low: ${fmtNum(stock.low_52w, 2)}</span>
+            <span style="font-size: 12px; color: var(--green);">High: ${fmtNum(stock.high_52w, 2)}</span>
+          </div>
+          <div class="prog-bar" style="height: 8px;">
+            <div class="prog-fill" style="width: ${calculateRangePosition(stock.ltp, stock.low_52w, stock.high_52w)}%; background: linear-gradient(90deg, var(--red), var(--green));"></div>
+          </div>
+          <div style="text-align: center; margin-top: 6px;">
+            <span style="font-size: 11px; color: var(--text2);">Current: ${fmtNum(stock.ltp, 2)}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Additional Info -->
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+        <div class="card" style="margin: 0; padding: 16px;">
+          <div class="card-title" style="margin-bottom: 8px;">Company Info</div>
+          <div style="font-size: 13px; line-height: 1.8;">
+            <div><strong>Sector:</strong> ${stock.sector || '—'}</div>
+            <div><strong>Status:</strong> ${statusBadge(stock.status || 'live')}</div>
+            <div><strong>Listed Shares:</strong> ${stock.listed_shares ? fmtNum(stock.listed_shares) : '—'}</div>
+          </div>
+        </div>
+        <div class="card" style="margin: 0; padding: 16px;">
+          <div class="card-title" style="margin-bottom: 8px;">Trading Info</div>
+          <div style="font-size: 13px; line-height: 1.8;">
+            <div><strong>Last Updated:</strong> ${stock.last_updated ? new Date(stock.last_updated).toLocaleString() : '—'}</div>
+            <div><strong>Turnover:</strong> ${stock.turnover ? 'रू ' + fmtNum(stock.turnover) : '—'}</div>
+            <div><strong>Transactions:</strong> ${stock.transactions ? fmtNum(stock.transactions) : '—'}</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Notes -->
+      ${stock.notes ? `
+        <div class="card" style="margin: 0; padding: 16px;">
+          <div class="card-title">Notes</div>
+          <div style="font-size: 13px; color: var(--text2); line-height: 1.5;">${stock.notes}</div>
+        </div>
+      ` : ''}
+      
+      <!-- Mini Chart Preview -->
+      <div class="card" style="margin: 0; padding: 16px;">
+        <div class="card-title">Recent Performance</div>
+        <div class="cwrap" style="height: 200px;">
+          <canvas id="detailMiniChart"></canvas>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  document.getElementById('stockDetailContent').innerHTML = content;
+  
+  // Setup history button
+  const historyBtn = document.getElementById('detailViewHistoryBtn');
+  historyBtn.onclick = () => {
+    closeModal('stockDetailModal');
+    openHistoryModal(stock.symbol);
+  };
+  
+  // Render mini chart
+  setTimeout(() => {
+    renderMiniStockChart(stock.symbol);
+  }, 100);
+  
+  // Open the modal
+  openModal('stockDetailModal');
+}
+
+// Helper function to calculate position in 52-week range
+function calculateRangePosition(current, low, high) {
+  if (!current || !low || !high || low === high) return 50;
+  const position = ((current - low) / (high - low)) * 100;
+  return Math.min(100, Math.max(0, position));
+}
+
+// Render mini chart in detail modal
+function renderMiniStockChart(symbol) {
+  const canvas = document.getElementById('detailMiniChart');
+  if (!canvas) return;
+  
+  // Generate mock historical data for the chart
+  const stock = _stocks.find(s => s.symbol === symbol);
+  if (!stock) return;
+  
+  const labels = [];
+  const prices = [];
+  let price = stock.ltp || 100;
+  
+  // Generate 30 days of mock price data
+  for (let i = 30; i >= 0; i--) {
+    const date = new Date();
+    date.setDate(date.getDate() - i);
+    labels.push(date.toLocaleDateString('en', { month: 'short', day: 'numeric' }));
+    
+    // Random walk from current price
+    const change = (Math.random() - 0.5) * 0.03 * price;
+    price = Math.max(1, price + change);
+    prices.push(price);
+  }
+  
+  // Destroy existing chart if any
+  const existingChart = Chart.getChart(canvas);
+  if (existingChart) existingChart.destroy();
+  
+  // Create new chart
+  new Chart(canvas, {
+    type: 'line',
+    data: {
+      labels: labels,
+      datasets: [{
+        label: symbol,
+        data: prices,
+        borderColor: stock.change_pct >= 0 ? '#10c98a' : '#f05252',
+        backgroundColor: `rgba(${stock.change_pct >= 0 ? '16,201,138' : '240,82,82'}, 0.1)`,
+        borderWidth: 2,
+        pointRadius: 0,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(17,21,32,0.95)',
+          borderColor: 'rgba(255,255,255,0.1)',
+          borderWidth: 1
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 6, font: { size: 10 } } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { size: 10 } } }
+      }
+    }
+  });
 }
 
 function clearStockForm() {
