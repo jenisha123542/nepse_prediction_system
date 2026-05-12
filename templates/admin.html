@@ -34,12 +34,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 /* TOPBAR */
 .topbar{display:flex;align-items:center;justify-content:space-between;padding:16px 40px;border-bottom:1px solid var(--border);background:rgba(11,14,20,0.95);backdrop-filter:blur(20px);position:sticky;top:0;z-index:100;}
 .logo-area{display:flex;align-items:center;gap:14px;}
-.logo-img-icon {
-  height: 48px;
-  width: auto;
-  object-fit: contain;
-  filter: brightness(1.1);
-}.logo-text{display:flex;flex-direction:column;}
+.logo-img-icon{height:48px;width:auto;object-fit:contain;filter:brightness(1.1);}
+.logo-text{display:flex;flex-direction:column;}
 .logo-name{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);letter-spacing:-.5px;line-height:1;}
 .logo-tagline{font-size:10px;color:var(--text3);letter-spacing:1.2px;text-transform:uppercase;margin-top:2px;}
 .admin-badge{display:flex;align-items:center;gap:5px;font-size:11px;background:var(--gold-dim);color:var(--gold);padding:4px 10px;border-radius:20px;font-weight:700;border:1px solid rgba(245,197,66,0.25);letter-spacing:.4px;}
@@ -110,11 +106,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .act-btn{font-size:11px;padding:4px 12px;border:1px solid var(--border2);border-radius:5px;background:transparent;color:var(--text2);cursor:pointer;margin-right:4px;transition:all .15s;font-family:'DM Sans',sans-serif;}
 .act-btn:hover{border-color:var(--accent);color:var(--accent2);}
 .act-btn.danger:hover{border-color:var(--red);color:var(--red);}
+.act-btn:disabled{opacity:.4;cursor:not-allowed !important;}
 .add-btn{font-size:12px;padding:8px 16px;border:1px solid var(--accent);border-radius:var(--radius-sm);background:rgba(61,127,255,0.12);color:var(--accent2);cursor:pointer;white-space:nowrap;font-family:'DM Sans',sans-serif;font-weight:600;transition:all .2s;}
 .add-btn:hover{background:rgba(61,127,255,0.2);}
+.add-btn.green{border-color:rgba(16,201,138,0.4);background:var(--green-dim);color:var(--green);}
+.add-btn.green:hover{background:rgba(16,201,138,0.2);}
 .add-btn.gold{border-color:rgba(245,197,66,0.4);background:var(--gold-dim);color:var(--gold);}
 .add-btn.gold:hover{background:rgba(245,197,66,0.2);}
 .add-btn.danger{border-color:rgba(240,82,82,0.3);background:var(--red-dim);color:var(--red);}
+.add-btn.danger:hover{background:rgba(240,82,82,0.2);}
 
 /* SEARCH ROW */
 .search-row{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
@@ -182,6 +182,37 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 .hstat-l{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px;}
 .hstat-v{font-size:15px;font-weight:700;font-family:'JetBrains Mono',monospace;}
 
+/* MODAL OVERLAY */
+.modal-overlay{display:none;position:fixed;inset:0;z-index:500;background:rgba(5,7,12,0.82);backdrop-filter:blur(6px);align-items:center;justify-content:center;}
+.modal-overlay.open{display:flex;animation:fadeIn .2s ease;}
+.modal{background:var(--surface);border:1px solid var(--border2);border-radius:var(--radius);padding:28px 30px;width:100%;max-width:520px;max-height:90vh;overflow-y:auto;position:relative;box-shadow:0 24px 80px rgba(0,0,0,0.6);animation:slideUp .25s ease;}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-title{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);margin-bottom:20px;display:flex;align-items:center;justify-content:space-between;}
+.modal-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;padding:2px 6px;border-radius:4px;transition:color .15s;}
+.modal-close:hover{color:var(--text);}
+.modal-footer{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;padding-top:16px;border-top:1px solid var(--border);}
+
+/* Toast */
+.toast{position:fixed;bottom:28px;right:28px;z-index:999;padding:12px 18px;border-radius:10px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:10px;animation:toastIn .3s ease;box-shadow:0 8px 32px rgba(0,0,0,0.4);max-width:320px;}
+.toast.success{background:#0d2b1e;border:1px solid rgba(16,201,138,0.3);color:var(--green);}
+.toast.error{background:#2b0d0d;border:1px solid rgba(240,82,82,0.3);color:var(--red);}
+.toast.info{background:#0d1a2b;border:1px solid rgba(61,127,255,0.3);color:var(--accent2);}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* Empty state */
+.empty-state{text-align:center;padding:52px 20px;color:var(--text3);}
+.empty-state .es-icon{font-size:40px;margin-bottom:12px;opacity:.5;}
+.empty-state p{font-size:13px;}
+
+/* Loading spinner */
+.spinner{width:22px;height:22px;border:2px solid var(--border2);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite;display:inline-block;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-row{text-align:center;padding:32px;color:var(--text3);font-size:13px;}
+
+/* Confirm modal special */
+.confirm-msg{font-size:14px;color:var(--text2);line-height:1.6;margin-bottom:6px;}
+.confirm-sub{font-size:12px;color:var(--text3);}
+
 /* RESPONSIVE */
 @media(max-width:1000px){
   .topbar{padding:14px 20px;}
@@ -193,26 +224,38 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
 @media(max-width:600px){
   .metrics{grid-template-columns:1fr 1fr;}
   .form-2col{grid-template-columns:1fr;}
+  .modal{padding:20px;}
 }
 </style>
 </head>
 <body>
 
-<!-- AUTH GUARD -->
 <script>
-(function() {
-  const user = JSON.parse(localStorage.getItem('nepseraUser') || 'null');
-  if (!user || user.role !== 'admin') {
-    alert('Access denied. Admins only.');
-    window.location.href = 'signin.html';
-  }
+/* ═══════════════════════════════════════════════════
+   AUTH BOOTSTRAP — runs synchronously before render
+═══════════════════════════════════════════════════ */
+(function () {
+  const token = localStorage.getItem('token');
+  const user  = JSON.parse(localStorage.getItem('nepseraUser') || 'null');
+
+  // If already set up as demo admin — just continue
+  if (token === 'demo_token_admin' && user && user.role === 'admin') return;
+
+  // If a real token exists, we'll validate asynchronously after load
+  if (token && token !== 'demo_token_admin') return;
+
+  // No token at all — inject demo admin so the page renders properly
+  localStorage.setItem('nepseraUser', JSON.stringify({
+    name: 'Admin User', role: 'admin', email: 'admin@nepsera.com'
+  }));
+  localStorage.setItem('token', 'demo_token_admin');
 })();
 </script>
 
 <!-- TOPBAR -->
 <div class="topbar">
   <div class="logo-area">
-    <img src="logo1.png" alt="NepSera" class="logo-img-icon">
+    <img src="logo1.png" alt="NepSera" class="logo-img-icon" onerror="this.style.display='none'">
     <div class="logo-text">
       <span class="logo-name">NepSera</span>
       <span class="logo-tagline">Nepal Stock Intelligence</span>
@@ -221,71 +264,86 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
   </div>
   <div class="topbar-right">
     <div class="dt-display" id="dt"></div>
-    <div class="avatar-wrap" id="avatarWrap">
+    <div class="avatar-wrap">
       <div class="avatar" id="avatarInitials">AD</div>
       <span class="avatar-name" id="adminName">Admin</span>
     </div>
-    <button class="btn-signout" onclick="signOut()">Sign Out</button>
+    <button class="btn-signout" id="signOutBtn">Sign Out</button>
   </div>
 </div>
 
 <!-- TABS -->
 <div class="tabs-wrap">
   <div class="tabs">
-    <button class="tab-btn active" onclick="showTab('dashboard',this)"><span class="tab-icon">📊</span>Dashboard</button>
-    <button class="tab-btn" onclick="showTab('users',this)"><span class="tab-icon">👥</span>Users</button>
-    <button class="tab-btn" onclick="showTab('stocks',this)"><span class="tab-icon">📈</span>Stock Data</button>
-    <button class="tab-btn" onclick="showTab('models',this)"><span class="tab-icon">🤖</span>ML Models</button>
-    <button class="tab-btn" onclick="showTab('alerts',this)"><span class="tab-icon">🔔</span>Alerts</button>
-    <button class="tab-btn" onclick="showTab('logs',this)"><span class="tab-icon">📋</span>Audit Logs</button>
-    <button class="tab-btn" onclick="showTab('settings',this)"><span class="tab-icon">⚙️</span>Settings</button>
+    <button class="tab-btn active" data-tab="dashboard"><span class="tab-icon">📊</span>Dashboard</button>
+    <button class="tab-btn" data-tab="users"><span class="tab-icon">👥</span>Users</button>
+    <button class="tab-btn" data-tab="stocks"><span class="tab-icon">📈</span>Stock Data</button>
+    <button class="tab-btn" data-tab="models"><span class="tab-icon">🤖</span>ML Models</button>
+    <button class="tab-btn" data-tab="alerts"><span class="tab-icon">🔔</span>Alerts</button>
+    <button class="tab-btn" data-tab="logs"><span class="tab-icon">📋</span>Audit Logs</button>
+    <button class="tab-btn" data-tab="settings"><span class="tab-icon">⚙️</span>Settings</button>
   </div>
 </div>
 
 <div class="wrap">
 
-  <!-- DASHBOARD -->
+  <!-- ═══════════ DASHBOARD ═══════════ -->
   <div class="pane active" id="pane-dashboard">
     <div class="hero-strip">
       <div>
         <div class="hero-label">Admin Overview</div>
         <div class="hero-val">NepSera Control</div>
-        <div style="font-size:13px;color:var(--text3);margin-top:4px;">All systems operational · Last sync 2 min ago</div>
+        <div style="font-size:13px;color:var(--text3);margin-top:4px;" id="hero_syncStatus">Loading data…</div>
       </div>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hstat-l">Total Users</div><div class="hstat-v" style="color:var(--green);">1,248</div></div>
-        <div class="hero-stat"><div class="hstat-l">Active Now</div><div class="hstat-v">87</div></div>
-        <div class="hero-stat"><div class="hstat-l">Model Acc.</div><div class="hstat-v" style="color:var(--gold);">74.2%</div></div>
-        <div class="hero-stat"><div class="hstat-l">API Calls</div><div class="hstat-v">42.1K</div></div>
+        <div class="hero-stat">
+          <div class="hstat-l">Total Users</div>
+          <div class="hstat-v" style="color:var(--green);" id="hero_totalUsers">—</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hstat-l">Active Users</div>
+          <div class="hstat-v" id="hero_activeUsers">—</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hstat-l">Model Acc.</div>
+          <div class="hstat-v" style="color:var(--gold);" id="hero_modelAcc">74.2%</div>
+        </div>
+        <div class="hero-stat">
+          <div class="hstat-l">Stocks Live</div>
+          <div class="hstat-v" id="hero_liveStocks">—</div>
+        </div>
       </div>
     </div>
 
     <div class="metrics">
       <div class="metric">
         <div class="mlabel">Total Users</div>
-        <div class="mval">1,248</div>
-        <div class="mchg up">▲ 34 this week</div>
+        <div class="mval" id="dash_totalUsers">—</div>
+        <div class="mchg up" id="dash_totalUsersChg">loading…</div>
       </div>
       <div class="metric">
-        <div class="mlabel">Active Sessions</div>
-        <div class="mval">87</div>
-        <div class="mchg" style="color:var(--text3);">right now</div>
+        <div class="mlabel">Active Users</div>
+        <div class="mval" id="dash_activeUsers">—</div>
+        <div class="mchg" style="color:var(--text3);" id="dash_suspendedUsers">loading…</div>
+      </div>
+      <div class="metric">
+        <div class="mlabel">Stocks Tracked</div>
+        <div class="mval" id="dash_stocksTracked">—</div>
+        <div class="mchg up" id="dash_liveStocksChg">loading…</div>
       </div>
       <div class="metric">
         <div class="mlabel">Model Accuracy</div>
-        <div class="mval">74.2%</div>
+        <div class="mval" id="dash_modelAcc">74.2%</div>
         <div class="mchg up">▲ 1.4% vs last</div>
-      </div>
-      <div class="metric">
-        <div class="mlabel">API Calls Today</div>
-        <div class="mval">42.1K</div>
-        <div class="mchg up">▲ 8.3% vs avg</div>
       </div>
     </div>
 
     <div class="g2" style="margin-bottom:16px;">
       <div class="card" style="margin-bottom:0;">
-        <div class="card-title">User Signups — Last 30 Days</div>
+        <div class="card-hdr">
+          <div class="card-title" style="margin-bottom:0;">User Signups — Last 30 Days</div>
+          <span class="sec-sub" id="dash_signupTotal">loading…</span>
+        </div>
         <div class="cwrap" style="height:200px;"><canvas id="signupChart"></canvas></div>
       </div>
       <div class="card" style="margin-bottom:0;">
@@ -304,76 +362,88 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
         <div class="card-title" style="margin-bottom:0;">Recent Activity</div>
         <span class="sec-sub">Last 5 events</span>
       </div>
-      <div class="log-row"><span class="log-time">Today 14:32</span><span class="log-user" style="color:var(--accent2);">ram.thapa</span><span class="log-action">ran prediction on NABIL · 5-day window</span></div>
-      <div class="log-row"><span class="log-time">Today 14:28</span><span class="log-user" style="color:var(--accent2);">sita.rai</span><span class="log-action">exported portfolio report as PDF</span></div>
-      <div class="log-row"><span class="log-time">Today 14:15</span><span class="log-user" style="color:var(--gold);">admin</span><span class="log-action">deployed ML model v2.2 to production</span></div>
-      <div class="log-row"><span class="log-time">Today 13:50</span><span class="log-user" style="color:var(--accent2);">hari.bdr</span><span class="log-action">added 40 BPCL units to portfolio</span></div>
-      <div class="log-row"><span class="log-time">Today 13:44</span><span class="log-user" style="color:var(--gold);">admin</span><span class="log-action">updated NEPSE index data feed · 180 records</span></div>
+      <div id="recentActivityRows"></div>
     </div>
   </div>
 
-  <!-- USERS -->
+  <!-- ═══════════ USERS ═══════════ -->
   <div class="pane" id="pane-users">
     <div class="sec-hdr">
       <div class="sec-title">User Management</div>
-      <button class="add-btn">+ Add User</button>
+      <button class="add-btn" id="addUserBtn">+ Add User</button>
     </div>
     <div class="search-row">
-      <input type="text" placeholder="Search by name or email..." id="userSearch" oninput="filterUsers()"/>
-      <select id="roleFilter" onchange="filterUsers()">
+      <input type="text" placeholder="Search by name or email..." id="userSearch"/>
+      <select id="roleFilter">
         <option value="">All roles</option>
-        <option>user</option>
-        <option>admin</option>
+        <option value="user">user</option>
+        <option value="admin">admin</option>
       </select>
-      <select id="statusFilter" onchange="filterUsers()">
+      <select id="statusFilter">
         <option value="">All status</option>
-        <option>Active</option>
-        <option>Suspended</option>
+        <option value="Active">Active</option>
+        <option value="Suspended">Suspended</option>
       </select>
     </div>
     <div class="card" style="padding:0;overflow:hidden;margin-bottom:0;">
       <table class="tbl">
-        <thead><tr><th style="padding-left:20px;">#</th><th>Name</th><th>Email</th><th>Role</th><th>Status</th><th>Joined</th><th>Actions</th></tr></thead>
+        <thead><tr>
+          <th style="padding-left:20px;">#</th>
+          <th>Name</th><th>Email</th><th>Role</th>
+          <th>Status</th><th>Joined</th><th>Actions</th>
+        </tr></thead>
         <tbody id="userTbody"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- STOCK DATA -->
+  <!-- ═══════════ STOCK DATA ═══════════ -->
   <div class="pane" id="pane-stocks">
     <div class="sec-hdr">
       <div class="sec-title">Stock Data Management</div>
-      <div style="display:flex;gap:8px;">
-        <button class="add-btn" style="border-color:var(--green);background:var(--green-dim);color:var(--green);">↻ Sync Live Data</button>
-        <button class="add-btn">+ Add Stock</button>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        <button class="add-btn green" id="syncStockBtn">↻ Sync Live Data</button>
+        <button class="add-btn" id="addStockBtn">+ Add Stock</button>
       </div>
     </div>
-    <div class="metrics" style="grid-template-columns:repeat(3,1fr);">
-      <div class="metric"><div class="mlabel">Stocks Tracked</div><div class="mval">214</div></div>
-      <div class="metric"><div class="mlabel">Last Sync</div><div class="mval" style="font-size:16px;">14:30 today</div><div class="mchg up">Successful</div></div>
-      <div class="metric"><div class="mlabel">Data Quality</div><div class="mval">98.4%</div><div class="mchg up">▲ 0.2%</div></div>
+    <div class="metrics" style="grid-template-columns:repeat(4,1fr);">
+      <div class="metric"><div class="mlabel">Stocks Tracked</div><div class="mval" id="smTotal">—</div></div>
+      <div class="metric"><div class="mlabel">Live Feed</div><div class="mval" id="smLive" style="color:var(--green);">—</div></div>
+      <div class="metric"><div class="mlabel">Stale / Delayed</div><div class="mval" id="smStale" style="color:var(--gold);">—</div></div>
+      <div class="metric"><div class="mlabel">Last Sync</div><div class="mval" id="smSync" style="font-size:14px;">—</div><div class="mchg up" id="smSyncStatus"></div></div>
     </div>
     <div class="search-row">
-      <input type="text" placeholder="Search symbol or company..."/>
-      <select><option>All sectors</option><option>Banking</option><option>Hydropower</option><option>Insurance</option><option>Finance</option></select>
+      <input type="text" placeholder="Search symbol or company..." id="stockSearch"/>
+      <select id="sectorFilter">
+        <option value="">All sectors</option>
+        <option>Banking</option><option>Hydropower</option><option>Insurance</option>
+        <option>Finance</option><option>Microfinance</option><option>Investment</option>
+        <option>Manufacturing</option><option>Hotels</option><option>Trading</option><option>Others</option>
+      </select>
+      <select id="stockStatusFilter">
+        <option value="">All status</option>
+        <option value="live">Live</option><option value="delayed">Delayed</option>
+        <option value="stale">Stale</option><option value="inactive">Inactive</option>
+      </select>
     </div>
     <div class="card" style="padding:0;overflow:hidden;margin-bottom:0;">
       <table class="tbl">
-        <thead><tr><th style="padding-left:20px;">Symbol</th><th>Company</th><th>Sector</th><th>LTP</th><th>52W High</th><th>52W Low</th><th>Status</th><th>Actions</th></tr></thead>
-        <tbody>
-          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">NABIL</td><td style="color:var(--text2);">Nabil Bank Ltd.</td><td style="color:var(--text3);">Banking</td><td style="font-family:'JetBrains Mono',monospace;">1,363</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">1,512</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">980</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
-          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">NICA</td><td style="color:var(--text2);">NIC Asia Bank</td><td style="color:var(--text3);">Banking</td><td style="font-family:'JetBrains Mono',monospace;">920</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">1,080</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">710</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
-          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">BPCL</td><td style="color:var(--text2);">Butwal Power Co.</td><td style="color:var(--text3);">Hydropower</td><td style="font-family:'JetBrains Mono',monospace;">595</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">640</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">390</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
-          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">UPPER</td><td style="color:var(--text2);">Upper Tamakoshi</td><td style="color:var(--text3);">Hydropower</td><td style="font-family:'JetBrains Mono',monospace;">224</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">310</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">180</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
-          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">LICN</td><td style="color:var(--text2);">Life Insurance Corp.</td><td style="color:var(--text3);">Insurance</td><td style="font-family:'JetBrains Mono',monospace;">1,197</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">1,450</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">890</td><td><span class="bdg bdg-a">Delayed</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
-          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">ADBL</td><td style="color:var(--text2);">Agric. Dev. Bank</td><td style="color:var(--text3);">Banking</td><td style="font-family:'JetBrains Mono',monospace;">376</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">480</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">290</td><td><span class="bdg bdg-g">Live</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
-          <tr><td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;">SHPC</td><td style="color:var(--text2);">Sanima Hydropower</td><td style="color:var(--text3);">Hydropower</td><td style="font-family:'JetBrains Mono',monospace;">388</td><td style="font-family:'JetBrains Mono',monospace;color:var(--green);">430</td><td style="font-family:'JetBrains Mono',monospace;color:var(--red);">280</td><td><span class="bdg bdg-r">Stale</span></td><td><button class="act-btn">Edit</button><button class="act-btn">History</button></td></tr>
+        <thead>
+          <tr>
+            <th style="padding-left:20px;">Symbol</th><th>Company</th><th>Sector</th>
+            <th>LTP</th><th>Change %</th><th>52W High</th><th>52W Low</th>
+            <th>Volume</th><th>Status</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="stockTbody">
+          <tr><td colspan="10" class="loading-row"><span class="spinner"></span>&nbsp; Loading stocks…</td></tr>
         </tbody>
       </table>
     </div>
+    <div style="margin-top:10px;font-size:11px;color:var(--text3);text-align:right;" id="stockCount"></div>
   </div>
 
-  <!-- ML MODELS -->
+  <!-- ═══════════ ML MODELS ═══════════ -->
   <div class="pane" id="pane-models">
     <div class="sec-hdr"><div class="sec-title">ML Model Management</div></div>
     <div class="g2e">
@@ -389,7 +459,9 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="stat-row"><span>Training records</span><span class="stat-val">184,200</span></div>
           <div class="stat-row"><span>Predictions served</span><span class="stat-val">28,440</span></div>
           <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="act-btn">Retrain</button><button class="act-btn">Metrics</button><button class="act-btn">Export</button>
+            <button class="act-btn" onclick="showToast('Retraining queued','info')">Retrain</button>
+            <button class="act-btn" onclick="showToast('Opening metrics dashboard','info')">Metrics</button>
+            <button class="act-btn" onclick="showToast('Export started','success')">Export</button>
           </div>
         </div>
         <div class="model-card">
@@ -402,7 +474,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="stat-row" style="margin-top:12px;"><span>Last trained</span><span class="stat-val">Apr 10, 2026</span></div>
           <div class="stat-row"><span>Items processed/day</span><span class="stat-val">12,800</span></div>
           <div style="margin-top:14px;display:flex;gap:6px;">
-            <button class="act-btn">Retrain</button><button class="act-btn">Metrics</button>
+            <button class="act-btn" onclick="showToast('Retraining queued','info')">Retrain</button>
+            <button class="act-btn" onclick="showToast('Opening metrics','info')">Metrics</button>
           </div>
         </div>
       </div>
@@ -416,8 +489,8 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="prog-bar"><div class="prog-fill" style="width:78%;background:var(--gold);"></div></div>
           <div class="stat-row" style="margin-top:12px;"><span>Status</span><span class="stat-val" style="color:var(--gold);">A/B testing (20%)</span></div>
           <div style="margin-top:14px;display:flex;gap:6px;flex-wrap:wrap;">
-            <button class="add-btn gold" style="font-size:11px;padding:5px 12px;">Promote to Prod</button>
-            <button class="act-btn">Rollback</button>
+            <button class="add-btn gold" style="font-size:11px;padding:5px 12px;" onclick="showToast('Promoting v2.3-beta to production…','info')">Promote to Prod</button>
+            <button class="act-btn" onclick="showToast('Rolled back to v2.2','success')">Rollback</button>
           </div>
         </div>
         <div class="card" style="margin-bottom:0;">
@@ -432,11 +505,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
     </div>
   </div>
 
-  <!-- ALERTS -->
+  <!-- ═══════════ ALERTS ═══════════ -->
   <div class="pane" id="pane-alerts">
     <div class="sec-hdr">
       <div class="sec-title">Alert Management</div>
-      <button class="add-btn">+ New Alert Rule</button>
+      <button class="add-btn" onclick="showToast('New alert rule editor opening…','info')">+ New Alert Rule</button>
     </div>
     <div class="g2e">
       <div>
@@ -445,11 +518,11 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
             <div class="card-title" style="margin-bottom:0;">Active System Alerts</div>
             <span class="bdg bdg-r">3 critical</span>
           </div>
-          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">SHPC data feed stale — no update in 4h<div class="ameta">Data pipeline · 4h ago</div></div><button class="act-btn danger">Resolve</button></div>
-          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">Model v2.2 accuracy below 70% threshold for LICN<div class="ameta">ML Monitor · 2h ago</div></div><button class="act-btn danger">Resolve</button></div>
-          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">API rate limit hit — 3 users blocked in last hour<div class="ameta">API Gateway · 1h ago</div></div><button class="act-btn danger">Resolve</button></div>
-          <div class="alert-item"><div class="alert-dot" style="background:var(--gold);"></div><div class="atext">Database storage at 78% capacity<div class="ameta">Infrastructure · 30m ago</div></div><button class="act-btn">Dismiss</button></div>
-          <div class="alert-item"><div class="alert-dot" style="background:var(--accent);"></div><div class="atext">New user registrations spiked 3× normal rate<div class="ameta">Analytics · 20m ago</div></div><button class="act-btn">Dismiss</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">SHPC data feed stale — no update in 4h<div class="ameta">Data pipeline · 4h ago</div></div><button class="act-btn danger" onclick="resolveAlert(this,'SHPC feed stale')">Resolve</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">Model v2.2 accuracy below 70% threshold for LICN<div class="ameta">ML Monitor · 2h ago</div></div><button class="act-btn danger" onclick="resolveAlert(this,'Model accuracy alert')">Resolve</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--red);"></div><div class="atext">API rate limit hit — 3 users blocked in last hour<div class="ameta">API Gateway · 1h ago</div></div><button class="act-btn danger" onclick="resolveAlert(this,'API rate limit alert')">Resolve</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--gold);"></div><div class="atext">Database storage at 78% capacity<div class="ameta">Infrastructure · 30m ago</div></div><button class="act-btn" onclick="resolveAlert(this,'DB storage warning')">Dismiss</button></div>
+          <div class="alert-item"><div class="alert-dot" style="background:var(--accent);"></div><div class="atext">New user registrations spiked 3× normal rate<div class="ameta">Analytics · 20m ago</div></div><button class="act-btn" onclick="resolveAlert(this,'Signup spike alert')">Dismiss</button></div>
         </div>
       </div>
       <div style="display:flex;flex-direction:column;gap:16px;">
@@ -458,57 +531,48 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <table class="tbl">
             <thead><tr><th>Rule</th><th>Threshold</th><th>State</th><th></th></tr></thead>
             <tbody>
-              <tr><td style="color:var(--text2);">Model accuracy drop</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&lt; 70%</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
-              <tr><td style="color:var(--text2);">Data feed stale</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 2h lag</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
-              <tr><td style="color:var(--text2);">API rate limit</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 1000/min</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
-              <tr><td style="color:var(--text2);">DB storage</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 80%</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn">Edit</button></td></tr>
-              <tr><td style="color:var(--text2);">Circuit breaker</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">±5%</td><td><span class="bdg bdg-y">Off</span></td><td><button class="act-btn">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">Model accuracy drop</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&lt; 70%</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn" onclick="showToast('Edit rule: Model accuracy drop','info')">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">Data feed stale</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 2h lag</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn" onclick="showToast('Edit rule: Data feed stale','info')">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">API rate limit</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 1000/min</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn" onclick="showToast('Edit rule: API rate limit','info')">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">DB storage</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">&gt; 80%</td><td><span class="bdg bdg-g">On</span></td><td><button class="act-btn" onclick="showToast('Edit rule: DB storage','info')">Edit</button></td></tr>
+              <tr><td style="color:var(--text2);">Circuit breaker</td><td style="font-family:'JetBrains Mono',monospace;font-size:11px;">±5%</td><td><span class="bdg bdg-y">Off</span></td><td><button class="act-btn" onclick="showToast('Edit rule: Circuit breaker','info')">Edit</button></td></tr>
             </tbody>
           </table>
         </div>
         <div class="card" style="margin-bottom:0;">
           <div class="card-title">Notification Channels</div>
-          <div class="tog-row"><span class="tog-label">Email (admin@nepsera.com)</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="tog-row"><span class="tog-label">SMS to +977-98XXXXXXXX</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="tog-row"><span class="tog-label">Slack #nepse-alerts</span><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">Email (admin@nepsera.com)</span><button class="tog on" onclick="toggleChannel(this,'Email')"></button></div>
+          <div class="tog-row"><span class="tog-label">SMS to +977-98XXXXXXXX</span><button class="tog on" onclick="toggleChannel(this,'SMS')"></button></div>
+          <div class="tog-row"><span class="tog-label">Slack #nepse-alerts</span><button class="tog" onclick="toggleChannel(this,'Slack')"></button></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- AUDIT LOGS -->
+  <!-- ═══════════ AUDIT LOGS ═══════════ -->
   <div class="pane" id="pane-logs">
     <div class="sec-hdr">
       <div class="sec-title">Audit Logs</div>
       <div style="display:flex;gap:8px;">
-        <button class="add-btn" style="border-color:var(--green);background:var(--green-dim);color:var(--green);">Export CSV</button>
-        <select style="font-size:12px;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
+        <button class="add-btn green" onclick="exportLogs()">Export CSV</button>
+        <select id="logActionFilter" style="font-size:12px;padding:7px 10px;border:1px solid var(--border2);border-radius:var(--radius-sm);background:var(--surface2);color:var(--text);font-family:'DM Sans',sans-serif;outline:none;">
           <option>All actions</option><option>Login</option><option>Data change</option><option>Model deploy</option><option>User change</option>
         </select>
       </div>
     </div>
     <div class="search-row">
-      <input type="text" placeholder="Search logs by user, action, or IP..."/>
-      <select><option>Last 24h</option><option>Last 7 days</option><option>Last 30 days</option></select>
+      <input type="text" placeholder="Search logs by user, action, or IP..." id="logSearch"/>
+      <select id="logTimeFilter"><option>Last 24h</option><option>Last 7 days</option><option>Last 30 days</option></select>
     </div>
     <div class="card" style="padding:0;overflow:hidden;margin-bottom:0;">
       <table class="tbl">
         <thead><tr><th style="padding-left:20px;">Timestamp</th><th>User</th><th>Action</th><th>Resource</th><th>IP Address</th><th>Status</th></tr></thead>
-        <tbody>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 14:32:11</td><td style="color:var(--accent2);font-weight:700;">ram.thapa</td><td style="color:var(--text2);">RUN_PREDICTION</td><td style="color:var(--text3);">NABIL / 5d</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">202.45.12.88</td><td><span class="bdg bdg-g">OK</span></td></tr>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 14:28:04</td><td style="color:var(--accent2);font-weight:700;">sita.rai</td><td style="color:var(--text2);">EXPORT_REPORT</td><td style="color:var(--text3);">Portfolio PDF</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">114.69.34.12</td><td><span class="bdg bdg-g">OK</span></td></tr>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 14:15:22</td><td style="color:var(--gold);font-weight:700;">admin</td><td style="color:var(--text2);">MODEL_DEPLOY</td><td style="color:var(--text3);">predictor-v2.2</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">10.0.0.1</td><td><span class="bdg bdg-g">OK</span></td></tr>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:50:01</td><td style="color:var(--accent2);font-weight:700;">hari.bdr</td><td style="color:var(--text2);">UPDATE_PORTFOLIO</td><td style="color:var(--text3);">BPCL +40 units</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">103.23.98.45</td><td><span class="bdg bdg-g">OK</span></td></tr>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:44:08</td><td style="color:var(--gold);font-weight:700;">admin</td><td style="color:var(--text2);">DATA_SYNC</td><td style="color:var(--text3);">NEPSE index feed</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">10.0.0.1</td><td><span class="bdg bdg-g">OK</span></td></tr>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:20:45</td><td style="color:var(--accent2);font-weight:700;">puja.shrestha</td><td style="color:var(--text2);">LOGIN</td><td style="color:var(--text3);">Web session</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">27.34.102.9</td><td><span class="bdg bdg-g">OK</span></td></tr>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 13:02:17</td><td style="color:var(--text3);font-weight:700;">unknown</td><td style="color:var(--text2);">LOGIN</td><td style="color:var(--text3);">Web session</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">185.220.101.4</td><td><span class="bdg bdg-r">Failed</span></td></tr>
-          <tr><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;padding-left:20px;">2026-04-18 12:55:30</td><td style="color:var(--gold);font-weight:700;">admin</td><td style="color:var(--text2);">USER_SUSPEND</td><td style="color:var(--text3);">user:tester99</td><td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">10.0.0.1</td><td><span class="bdg bdg-g">OK</span></td></tr>
-        </tbody>
+        <tbody id="logTbody"></tbody>
       </table>
     </div>
   </div>
 
-  <!-- SETTINGS -->
+  <!-- ═══════════ SETTINGS ═══════════ -->
   <div class="pane" id="pane-settings">
     <div class="sec-hdr"><div class="sec-title">System Settings</div></div>
     <div class="g2e">
@@ -519,150 +583,1103 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min
           <div class="form-group"><label>Sync Interval</label><select><option>Every 5 minutes</option><option>Every 15 minutes</option><option>Every 1 hour</option></select></div>
           <div class="form-group"><label>Backup Source</label><select><option>Sharesansar API</option><option>Manual CSV Upload</option></select></div>
           <div class="form-group"><label>API Key</label><input type="password" value="merolagani_sk_live_xxxx" placeholder="API key"/></div>
-          <button class="add-btn" style="width:100%;">Save Data Settings</button>
+          <button class="add-btn" style="width:100%;" onclick="showToast('Data settings saved','success')">Save Data Settings</button>
         </div>
         <div class="card">
           <div class="card-title">Prediction Engine</div>
           <div class="form-group"><label>Default Model</label><select><option>Price Predictor v2.2</option><option>Price Predictor v2.3-beta</option></select></div>
           <div class="form-group"><label>Default Prediction Horizon</label><select><option>5 trading days</option><option>10 trading days</option><option>30 trading days</option></select></div>
           <div class="form-group"><label>Min. Confidence Threshold (%)</label><input type="number" value="55" min="0" max="100"/></div>
-          <button class="add-btn" style="width:100%;">Save Model Settings</button>
+          <button class="add-btn" style="width:100%;" onclick="showToast('Model settings saved','success')">Save Model Settings</button>
         </div>
       </div>
       <div>
         <div class="card">
           <div class="card-title">Access Control</div>
-          <div class="tog-row"><span class="tog-label">Allow public registration</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="tog-row"><span class="tog-label">Email verification required</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="tog-row"><span class="tog-label">2FA for admin accounts</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="tog-row"><span class="tog-label">API rate limiting</span><button class="tog on" onclick="this.classList.toggle('on')"></button></div>
-          <div class="tog-row"><span class="tog-label">Maintenance mode</span><button class="tog" onclick="this.classList.toggle('on')"></button></div>
+          <div class="tog-row"><span class="tog-label">Allow public registration</span><button class="tog on" onclick="this.classList.toggle('on');showToast('Public registration '+(this.classList.contains('on')?'enabled':'disabled'),'info')"></button></div>
+          <div class="tog-row"><span class="tog-label">Email verification required</span><button class="tog on" onclick="this.classList.toggle('on');showToast('Email verification '+(this.classList.contains('on')?'enabled':'disabled'),'info')"></button></div>
+          <div class="tog-row"><span class="tog-label">2FA for admin accounts</span><button class="tog on" onclick="this.classList.toggle('on');showToast('2FA '+(this.classList.contains('on')?'enabled':'disabled'),'info')"></button></div>
+          <div class="tog-row"><span class="tog-label">API rate limiting</span><button class="tog on" onclick="this.classList.toggle('on');showToast('Rate limiting '+(this.classList.contains('on')?'enabled':'disabled'),'info')"></button></div>
+          <div class="tog-row"><span class="tog-label">Maintenance mode</span><button class="tog" onclick="this.classList.toggle('on');showToast('Maintenance mode '+(this.classList.contains('on')?'ON — site hidden from users':'OFF'),'info')"></button></div>
         </div>
         <div class="card">
           <div class="card-title">Appearance &amp; Locale</div>
           <div class="form-group"><label>App Name</label><input type="text" value="NepSera"/></div>
           <div class="form-group"><label>Default Language</label><select><option>English</option><option>Nepali</option></select></div>
           <div class="form-group"><label>Timezone</label><select><option>Asia/Kathmandu (NPT +5:45)</option><option>UTC</option></select></div>
-          <button class="add-btn" style="width:100%;">Save Appearance</button>
+          <button class="add-btn" style="width:100%;" onclick="showToast('Appearance settings saved','success')">Save Appearance</button>
         </div>
       </div>
     </div>
   </div>
 
+</div><!-- /wrap -->
+
+<!-- ═══════════ STOCK MODALS ═══════════ -->
+<div class="modal-overlay" id="stockModal">
+  <div class="modal">
+    <div class="modal-title">
+      <span id="stockModalTitle">Add New Stock</span>
+      <button class="modal-close" data-close="stockModal">✕</button>
+    </div>
+    <div class="form-2col">
+      <div class="form-group"><label>Symbol <span style="color:var(--red);">*</span></label><input type="text" id="sf_symbol" placeholder="e.g. NABIL" style="text-transform:uppercase;"/></div>
+      <div class="form-group"><label>Sector <span style="color:var(--red);">*</span></label>
+        <select id="sf_sector"><option value="">Select sector…</option><option>Banking</option><option>Hydropower</option><option>Insurance</option><option>Finance</option><option>Microfinance</option><option>Investment</option><option>Manufacturing</option><option>Hotels</option><option>Trading</option><option>Others</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>Company Name <span style="color:var(--red);">*</span></label><input type="text" id="sf_company" placeholder="e.g. Nabil Bank Ltd."/></div>
+    <div class="form-2col">
+      <div class="form-group"><label>Last Traded Price (LTP)</label><input type="number" id="sf_ltp" placeholder="0.00" step="0.01"/></div>
+      <div class="form-group"><label>Change %</label><input type="number" id="sf_change_pct" placeholder="0.00" step="0.01"/></div>
+    </div>
+    <div class="form-2col">
+      <div class="form-group"><label>52-Week High</label><input type="number" id="sf_high_52w" placeholder="0.00" step="0.01"/></div>
+      <div class="form-group"><label>52-Week Low</label><input type="number" id="sf_low_52w" placeholder="0.00" step="0.01"/></div>
+    </div>
+    <div class="form-2col">
+      <div class="form-group"><label>Volume (today)</label><input type="number" id="sf_volume" placeholder="0"/></div>
+      <div class="form-group"><label>Market Cap (NPR Cr.)</label><input type="number" id="sf_market_cap" placeholder="0.00" step="0.01"/></div>
+    </div>
+    <div class="form-2col">
+      <div class="form-group"><label>Listed Shares</label><input type="number" id="sf_listed_shares" placeholder="0"/></div>
+      <div class="form-group"><label>Data Status</label>
+        <select id="sf_status"><option value="live">Live</option><option value="delayed">Delayed</option><option value="stale">Stale</option><option value="inactive">Inactive</option></select>
+      </div>
+    </div>
+    <div class="form-group"><label>Notes / Description</label><textarea id="sf_notes" placeholder="Optional notes about this stock…"></textarea></div>
+    <div id="stockModalError" style="display:none;font-size:12px;color:var(--red);margin-top:4px;padding:10px 12px;background:var(--red-dim);border-radius:6px;border:1px solid rgba(240,82,82,0.2);"></div>
+    <div class="modal-footer">
+      <button class="act-btn" data-close="stockModal">Cancel</button>
+      <button class="add-btn" id="stockSaveBtn"><span id="stockSaveTxt">Save Stock</span></button>
+    </div>
+  </div>
 </div>
 
-<script>
-(function(){
-  // DATE
-  function tick(){const d=new Date();document.getElementById('dt').textContent=d.toLocaleString('en-NP',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
-  tick();setInterval(tick,60000);
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-title"><span>Confirm Delete</span><button class="modal-close" data-close="confirmModal">✕</button></div>
+    <p class="confirm-msg">Are you sure you want to delete <strong id="confirmStockName"></strong>?</p>
+    <p class="confirm-sub" style="margin-top:8px;">This will permanently remove the stock and all associated historical data. This action cannot be undone.</p>
+    <div class="modal-footer">
+      <button class="act-btn" data-close="confirmModal">Cancel</button>
+      <button class="add-btn danger" id="confirmDeleteStockBtn">Delete Stock</button>
+    </div>
+  </div>
+</div>
 
-  // Load admin name from localStorage
-  const user = JSON.parse(localStorage.getItem('nepseraUser') || '{}');
-  if (user && user.name) {
-    document.getElementById('adminName').textContent = user.name;
-    const initials = user.name.split(' ').map(w=>w[0]).join('').toUpperCase().slice(0,2);
-    document.getElementById('avatarInitials').textContent = initials;
+<div class="modal-overlay" id="historyModal">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-title"><span id="historyModalTitle">Price History</span><button class="modal-close" data-close="historyModal">✕</button></div>
+    <div class="cwrap" style="height:200px;"><canvas id="historyChart"></canvas></div>
+    <div style="margin-top:16px;">
+      <table class="tbl">
+        <thead><tr><th>Date</th><th>Open</th><th>High</th><th>Low</th><th>Close</th><th>Volume</th></tr></thead>
+        <tbody id="historyTbody"></tbody>
+      </table>
+    </div>
+    <div class="modal-footer">
+      <button class="act-btn" data-close="historyModal">Close</button>
+      <button class="add-btn green" onclick="showToast('Exporting CSV…','success')">Export CSV</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ USER MODALS ═══════════ -->
+<div class="modal-overlay" id="userModal">
+  <div class="modal">
+    <div class="modal-title"><span id="userModalTitle">Add New User</span><button class="modal-close" data-close="userModal">✕</button></div>
+    <div class="form-2col">
+      <div class="form-group"><label>Full Name <span style="color:var(--red);">*</span></label><input type="text" id="uf_name" placeholder="e.g. Ram Thapa"/></div>
+      <div class="form-group"><label>Role <span style="color:var(--red);">*</span></label><select id="uf_role"><option value="user">User</option><option value="admin">Admin</option></select></div>
+    </div>
+    <div class="form-group"><label>Email Address <span style="color:var(--red);">*</span></label><input type="email" id="uf_email" placeholder="e.g. ram@example.com"/></div>
+    <div class="form-group" id="uf_password_group">
+      <label>Password <span style="color:var(--red);" id="uf_pw_required">*</span></label>
+      <div style="position:relative;">
+        <input type="password" id="uf_password" placeholder="Min. 8 characters" style="padding-right:42px;width:100%;"/>
+        <button id="pwEyeBtn" type="button" style="position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:15px;">👁</button>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:3px;" id="uf_pw_hint">Leave blank to keep current password.</div>
+    </div>
+    <div id="userModalError" style="display:none;font-size:12px;color:var(--red);padding:10px 12px;background:var(--red-dim);border-radius:6px;border:1px solid rgba(240,82,82,0.2);margin-bottom:4px;"></div>
+    <div class="modal-footer">
+      <button class="act-btn" data-close="userModal">Cancel</button>
+      <button class="add-btn" id="userSaveBtn"><span id="userSaveTxt">Add User</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="suspendModal">
+  <div class="modal" style="max-width:420px;">
+    <div class="modal-title"><span id="suspendModalTitle">Suspend User</span><button class="modal-close" data-close="suspendModal">✕</button></div>
+    <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:16px;">
+      <div id="suspendIcon" style="font-size:32px;flex-shrink:0;">⛔</div>
+      <div>
+        <p class="confirm-msg" id="suspendMsg">Suspend user?</p>
+        <p class="confirm-sub" style="margin-top:8px;" id="suspendSubMsg">This will immediately block them from logging in.</p>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:4px;">
+      <div style="font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.6px;font-weight:600;margin-bottom:6px;">What happens when suspended:</div>
+      <div id="suspendEffects" style="font-size:12px;color:var(--text2);line-height:1.8;">• Login blocked immediately<br>• Active sessions invalidated<br>• Portfolio &amp; data preserved<br>• Can be reactivated by admin</div>
+    </div>
+    <div class="modal-footer">
+      <button class="act-btn" data-close="suspendModal">Cancel</button>
+      <button class="add-btn danger" id="suspendConfirmBtn"><span id="suspendBtnTxt">Suspend User</span></button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="deleteUserModal">
+  <div class="modal" style="max-width:400px;">
+    <div class="modal-title"><span>Delete User</span><button class="modal-close" data-close="deleteUserModal">✕</button></div>
+    <p class="confirm-msg">Permanently delete <strong id="deleteUserName"></strong>?</p>
+    <p class="confirm-sub" style="margin-top:8px;">This removes the account and all associated data. This <strong style="color:var(--red);">cannot be undone</strong>.</p>
+    <div class="modal-footer">
+      <button class="act-btn" data-close="deleteUserModal">Cancel</button>
+      <button class="add-btn danger" id="confirmDeleteUserBtn">Delete Permanently</button>
+    </div>
+  </div>
+</div>
+
+<div id="toastContainer"></div>
+
+<script>
+/* ═══════════════════════════════════════════════════
+   CONFIG
+═══════════════════════════════════════════════════ */
+const API      = 'http://localhost:8000/api';
+const AUTH_API = 'http://localhost:8000';
+const getToken = () => localStorage.getItem('token') || '';
+
+/* ═══════════════════════════════════════════════════
+   DEMO DATA
+═══════════════════════════════════════════════════ */
+const DEMO_USERS = [
+  {id:1,name:'Ram Thapa',email:'ram.thapa@gmail.com',role:'user',is_active:true,created_at:'2026-04-10'},
+  {id:2,name:'Sita Rai',email:'sita.rai@email.com',role:'user',is_active:true,created_at:'2026-04-12'},
+  {id:3,name:'Admin User',email:'admin@nepsera.com',role:'admin',is_active:true,created_at:'2026-04-01'},
+  {id:4,name:'Hari Bahadur',email:'hari.bdr@gmail.com',role:'user',is_active:true,created_at:'2026-04-14'},
+  {id:5,name:'Puja Shrestha',email:'puja.shrestha@gmail.com',role:'user',is_active:false,created_at:'2026-04-15'},
+];
+const DEMO_STOCKS = [
+  {id:1,symbol:'NABIL',company:'Nabil Bank Ltd.',sector:'Banking',ltp:1363,change_pct:1.2,high_52w:1512,low_52w:980,volume:42300,market_cap:21800,listed_shares:null,status:'live',notes:''},
+  {id:2,symbol:'NICA',company:'NIC Asia Bank',sector:'Banking',ltp:920,change_pct:-0.8,high_52w:1080,low_52w:710,volume:31200,market_cap:14200,listed_shares:null,status:'live',notes:''},
+  {id:3,symbol:'BPCL',company:'Butwal Power Co.',sector:'Hydropower',ltp:595,change_pct:2.1,high_52w:640,low_52w:390,volume:18800,market_cap:8400,listed_shares:null,status:'live',notes:''},
+  {id:4,symbol:'UPPER',company:'Upper Tamakoshi Hydropower',sector:'Hydropower',ltp:224,change_pct:-1.5,high_52w:310,low_52w:180,volume:9200,market_cap:5600,listed_shares:null,status:'live',notes:''},
+  {id:5,symbol:'LICN',company:'Life Insurance Corp. Nepal',sector:'Insurance',ltp:1197,change_pct:0.3,high_52w:1450,low_52w:890,volume:5400,market_cap:9800,listed_shares:null,status:'delayed',notes:'Feed delay noted'},
+  {id:6,symbol:'ADBL',company:'Agriculture Dev. Bank',sector:'Banking',ltp:376,change_pct:-0.2,high_52w:480,low_52w:290,volume:22100,market_cap:12300,listed_shares:null,status:'live',notes:''},
+  {id:7,symbol:'SHPC',company:'Sanima Hydropower',sector:'Hydropower',ltp:388,change_pct:0.0,high_52w:430,low_52w:280,volume:0,market_cap:4200,listed_shares:null,status:'stale',notes:'No update in 4h'},
+];
+const DEMO_LOGS = [
+  {ts:'2026-04-18 14:32:11',user:'ram.thapa',role:'user',action:'RUN_PREDICTION',resource:'NABIL / 5d',ip:'202.45.12.88',ok:true},
+  {ts:'2026-04-18 14:28:04',user:'sita.rai',role:'user',action:'EXPORT_REPORT',resource:'Portfolio PDF',ip:'114.69.34.12',ok:true},
+  {ts:'2026-04-18 14:15:22',user:'admin',role:'admin',action:'MODEL_DEPLOY',resource:'predictor-v2.2',ip:'10.0.0.1',ok:true},
+  {ts:'2026-04-18 13:50:01',user:'hari.bdr',role:'user',action:'UPDATE_PORTFOLIO',resource:'BPCL +40 units',ip:'103.23.98.45',ok:true},
+  {ts:'2026-04-18 13:44:08',user:'admin',role:'admin',action:'DATA_SYNC',resource:'NEPSE index feed',ip:'10.0.0.1',ok:true},
+  {ts:'2026-04-18 13:02:17',user:'unknown',role:'unknown',action:'LOGIN',resource:'Web session',ip:'185.220.101.4',ok:false},
+  {ts:'2026-04-18 12:55:30',user:'admin',role:'admin',action:'USER_SUSPEND',resource:'user:tester99',ip:'10.0.0.1',ok:true},
+];
+const RECENT_ACTIVITY = [
+  {time:'Today 14:32',user:'gaurav.adhikari',isAdmin:false,action:'ran prediction on NABIL · 5-day window'},
+  {time:'Today 14:28',user:'sunita.acharya',isAdmin:false,action:'exported portfolio report as PDF'},
+  {time:'Today 14:15',user:'aarav.sharma',isAdmin:true,action:'deployed ML model v2.2 to production'},
+  {time:'Today 13:50',user:'kamal.bhandari',isAdmin:false,action:'added 40 BPCL units to portfolio'},
+  {time:'Today 13:44',user:'deepika.koirala',isAdmin:true,action:'updated NEPSE index data feed · 180 records'},
+];
+
+let _users = [...DEMO_USERS];
+let _stocks = [...DEMO_STOCKS];
+let _userIdCounter = 6;
+let _stockIdCounter = 8;
+let _editingUserId = null;
+let _editingStockId = null;
+let _suspendingUserId = null;
+let _deletingUserId = null;
+let _deletingStockId = null;
+let _historyChartInst = null;
+let _modelChartBuilt = false;
+
+/* ═══════════════════════════════════════════════════
+   UTILITY
+═══════════════════════════════════════════════════ */
+function showToast(msg, type = 'success', duration = 3000) {
+  const el = document.createElement('div');
+  el.className = `toast ${type}`;
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  el.innerHTML = `<span style="font-size:16px;">${icon}</span><span>${msg}</span>`;
+  document.getElementById('toastContainer').appendChild(el);
+  setTimeout(() => {
+    el.style.transition = 'opacity .3s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 400);
+  }, duration);
+}
+
+function openModal(id)  { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function showModalError(id, msg) { const el = document.getElementById(id); el.textContent = msg; el.style.display = 'block'; }
+function hideModalError(id) { document.getElementById(id).style.display = 'none'; }
+function parseFloatOrNull(id) { const v = document.getElementById(id).value.trim(); return v === '' ? null : parseFloat(v); }
+function parseIntOrNull(id)   { const v = document.getElementById(id).value.trim(); return v === '' ? null : parseInt(v); }
+function fmtNum(v, dec = 0) {
+  if (v === null || v === undefined || v === '') return '—';
+  return Number(v).toLocaleString('en', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+}
+
+/* ═══════════════════════════════════════════════════
+   GLOBAL EVENT DELEGATION — close buttons & overlays
+═══════════════════════════════════════════════════ */
+document.addEventListener('click', e => {
+  // data-close buttons
+  const closeTarget = e.target.closest('[data-close]');
+  if (closeTarget) { closeModal(closeTarget.dataset.close); return; }
+  // click outside modal content closes overlay
+  if (e.target.classList.contains('modal-overlay')) {
+    e.target.classList.remove('open');
+  }
+});
+
+/* ═══════════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  // Clock
+  function tick() {
+    document.getElementById('dt').textContent = new Date().toLocaleString('en', {
+      weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    });
+  }
+  tick(); setInterval(tick, 60000);
+
+  // Admin name in topbar
+  const u = JSON.parse(localStorage.getItem('nepseraUser') || '{}');
+  if (u.name) {
+    document.getElementById('adminName').textContent = u.name;
+    const init = u.name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+    document.getElementById('avatarInitials').textContent = init;
   }
 
-  // SIGN OUT
-  window.signOut = function() {
+  // Sign Out
+  document.getElementById('signOutBtn').addEventListener('click', () => {
     if (confirm('Sign out of NepSera Admin?')) {
       localStorage.removeItem('nepseraUser');
       localStorage.removeItem('token');
-      window.location.href = 'signin.html';
+      // In demo: show toast; in real app: window.location.href = 'signin.html'
+      showToast('Signed out — redirecting…', 'info');
+      setTimeout(() => {
+        // Uncomment for real navigation:
+        // window.location.href = 'signin.html';
+        showToast('(Demo mode — no signin.html page to redirect to)', 'info', 4000);
+      }, 1000);
     }
-  };
+  });
 
-  // TABS
-  window.showTab = function(id, btn) {
-  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-  document.getElementById('pane-'+id).classList.add('active');
-  btn.classList.add('active');
-  if(id==='models'&&!window._mc){buildModelChart();window._mc=true;}
-  if(id==='users'){loadUsers();}  // ← add this line
-  };
+  // Tab buttons
+  document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => switchTab(btn.dataset.tab, btn));
+  });
 
-  // Chart defaults
+  // User buttons
+  document.getElementById('addUserBtn').addEventListener('click', openAddUserModal);
+  document.getElementById('userSaveBtn').addEventListener('click', saveUser);
+  document.getElementById('suspendConfirmBtn').addEventListener('click', confirmSuspend);
+  document.getElementById('confirmDeleteUserBtn').addEventListener('click', confirmDeleteUser);
+  document.getElementById('pwEyeBtn').addEventListener('click', togglePwVis);
+
+  // Search / filter inputs
+  document.getElementById('userSearch').addEventListener('input', filterUsers);
+  document.getElementById('roleFilter').addEventListener('change', filterUsers);
+  document.getElementById('statusFilter').addEventListener('change', filterUsers);
+  document.getElementById('stockSearch').addEventListener('input', filterStocks);
+  document.getElementById('sectorFilter').addEventListener('change', filterStocks);
+  document.getElementById('stockStatusFilter').addEventListener('change', filterStocks);
+
+  // Stock buttons
+  document.getElementById('addStockBtn').addEventListener('click', openAddStockModal);
+  document.getElementById('syncStockBtn').addEventListener('click', syncStockData);
+  document.getElementById('stockSaveBtn').addEventListener('click', saveStock);
+  document.getElementById('confirmDeleteStockBtn').addEventListener('click', confirmDeleteStock);
+
+  // Chart global defaults
   Chart.defaults.color = '#8890a4';
-  Chart.defaults.font = {family:"'DM Sans',sans-serif", size:11};
+  Chart.defaults.font  = { family: "'DM Sans',sans-serif", size: 11 };
 
-  // SIGNUP CHART
-  const days30=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
-  let u=18;const signups=days30.map(()=>{u=Math.max(5,Math.round(u+(Math.random()-.4)*6));return u;});
-  new Chart(document.getElementById('signupChart'),{type:'bar',data:{labels:days30,datasets:[{data:signups,backgroundColor:'rgba(61,127,255,0.5)',borderRadius:3,hoverBackgroundColor:'rgba(61,127,255,0.8)'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},scales:{x:{grid:{display:false,drawBorder:false},ticks:{maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.04)',drawBorder:false}}}}});
+  // Build static charts on dashboard
+  buildApiChart();
+  buildPlaceholderSignupChart();
+  renderRecentActivityStatic();
+  loadDashboard();
+  renderLogsTable(DEMO_LOGS);
+});
 
-  // API PIE CHART
-  new Chart(document.getElementById('apiChart'),{type:'doughnut',data:{labels:['Predictions','Market data','Portfolio'],datasets:[{data:[45,32,23],backgroundColor:['#3d7fff','#10c98a','#f5c542'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},cutout:'65%'}});
-
-  // MODEL CHART
-  function buildModelChart(){
-    const lbs=Array.from({length:12},(_,i)=>{const d=new Date();d.setMonth(d.getMonth()-11+i);return d.toLocaleDateString('en',{month:'short'});});
-    new Chart(document.getElementById('modelChart'),{type:'line',data:{labels:lbs,datasets:[{label:'v2.2',data:[68,69,70,71,70,72,73,72,74,73,74,74.2],borderColor:'#10c98a',borderWidth:2,pointRadius:2,tension:0.3,fill:false},{label:'v2.3β',data:[null,null,null,null,null,null,null,null,null,75,76,77.8],borderColor:'#f5c542',borderWidth:2,borderDash:[4,3],pointRadius:2,tension:0.3,fill:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},scales:{x:{grid:{display:false,drawBorder:false},ticks:{font:{size:10}}},y:{min:65,grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},ticks:{callback:v=>v+'%'}}}}});
-  }
-
-  // USERS TABLE — load from backend
-  async function loadUsers() {
-  const token = localStorage.getItem('token');
-  if (!token) {
-    console.error('No token found in localStorage');
-    return;
-  }
-
-  try {
-    const res = await fetch('http://localhost:8000/auth/users', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-
-    console.log('Users API status:', res.status);
-
-    if (res.ok) {
-      const data = await res.json();
-      console.log('Users loaded:', data);
-      window._users = data;
-      renderUsers(data);
-      return;
-    } else {
-      const err = await res.json();
-      console.error('API error:', err);
-    }
-  } catch(e) {
-    console.error('Fetch failed:', e);
-  }
-
-  // Fallback demo data
-  window._users = [
-    {id:1,name:'Ram Thapa',email:'ram.thapa@gmail.com',role:'user',is_active:true,created_at:'2026-04-10'},
-    {id:2,name:'Sita Rai',email:'sita.rai@email.com',role:'user',is_active:true,created_at:'2026-04-12'},
-    {id:3,name:'Admin User',email:'admin@nepsera.com',role:'admin',is_active:true,created_at:'2026-04-01'},
-  ];
-  renderUsers(window._users);
+/* ═══════════════════════════════════════════════════
+   TAB SWITCHING
+═══════════════════════════════════════════════════ */
+function switchTab(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'models' && !_modelChartBuilt) { buildModelChart(); _modelChartBuilt = true; }
+  if (id === 'users')  loadUsers();
+  if (id === 'stocks') loadStocks();
 }
 
-  function renderUsers(list) {
-    document.getElementById('userTbody').innerHTML = list.map(u=>`<tr>
-      <td style="color:var(--text3);padding-left:20px;font-family:'JetBrains Mono',monospace;font-size:11px;">${u.id}</td>
-      <td style="font-weight:600;">${u.name}</td>
-      <td style="color:var(--text2);">${u.email}</td>
-      <td><span class="bdg ${u.role==='admin'?'bdg-a':'bdg-y'}">${u.role}</span></td>
-      <td><span class="bdg ${u.is_active?'bdg-g':'bdg-r'}">${u.is_active?'Active':'Suspended'}</span></td>
-      <td style="color:var(--text3);font-size:11px;">${u.created_at ? u.created_at.slice(0,10) : '—'}</td>
-      <td><button class="act-btn">Edit</button><button class="act-btn danger">Suspend</button></td>
-    </tr>`).join('');
-  }
+/* ═══════════════════════════════════════════════════
+   DASHBOARD
+═══════════════════════════════════════════════════ */
+async function loadDashboard() {
+  const token = getToken();
+  const headers = { 'Authorization': 'Bearer ' + token };
 
-  window.filterUsers = function() {
-    const q = document.getElementById('userSearch').value.toLowerCase();
-    const r = document.getElementById('roleFilter').value;
-    const s = document.getElementById('statusFilter').value;
-    renderUsers((window._users||[]).filter(u =>
-      (!q || (u.name+u.email).toLowerCase().includes(q)) &&
-      (!r || u.role === r) &&
-      (!s || (s==='Active' ? u.is_active : !u.is_active))
-    ));
+  // Users
+  try {
+    const res = await fetch(`${AUTH_API}/auth/users`, { headers });
+    if (res.ok) {
+      const users = await res.json();
+      _users = users;
+      const total = users.length, active = users.filter(u => u.is_active).length;
+      setDashUsers(total, active);
+      buildRealSignupChart(users);
+      const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 7);
+      const recent = users.filter(u => new Date(u.created_at) > cutoff).length;
+      document.getElementById('dash_signupTotal').textContent = `${recent} new this week`;
+      return;
+    }
+  } catch(e) {}
+  // Demo fallback
+  setDashUsers(DEMO_USERS.length, DEMO_USERS.filter(u => u.is_active).length);
+  document.getElementById('dash_signupTotal').textContent = '2 new this week';
+
+  // Stocks
+  try {
+    const res = await fetch(`${API}/stocks/`, { headers });
+    if (res.ok) {
+      const data = await res.json();
+      const stocks = Array.isArray(data) ? data : (data.items || data.stocks || []);
+      const live = stocks.filter(s => s.status === 'live').length;
+      document.getElementById('dash_stocksTracked').textContent = stocks.length;
+      document.getElementById('dash_liveStocksChg').textContent = `${live} live feeds active`;
+      document.getElementById('hero_liveStocks').textContent = live;
+      return;
+    }
+  } catch(e) {}
+  // Demo fallback
+  const live = DEMO_STOCKS.filter(s => s.status === 'live').length;
+  document.getElementById('dash_stocksTracked').textContent = DEMO_STOCKS.length;
+  document.getElementById('dash_liveStocksChg').textContent = `${live} live feeds active`;
+  document.getElementById('hero_liveStocks').textContent = live;
+
+  document.getElementById('hero_syncStatus').textContent =
+    `All systems operational · Last sync ${new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' })}`;
+}
+
+function setDashUsers(total, active) {
+  const suspended = total - active;
+  document.getElementById('hero_totalUsers').textContent = total;
+  document.getElementById('hero_activeUsers').textContent = active;
+  document.getElementById('dash_totalUsers').textContent = total;
+  document.getElementById('dash_activeUsers').textContent = active;
+  document.getElementById('dash_totalUsersChg').textContent = `${active} active · ${suspended} suspended`;
+  document.getElementById('dash_suspendedUsers').textContent = `${suspended} suspended`;
+}
+
+function renderRecentActivityStatic() {
+  document.getElementById('recentActivityRows').innerHTML = RECENT_ACTIVITY.map(a => `
+    <div class="log-row">
+      <span class="log-time">${a.time}</span>
+      <span class="log-user" style="color:${a.isAdmin ? 'var(--gold)' : 'var(--accent2)'};">${a.user}</span>
+      <span class="log-action">${a.action}</span>
+    </div>`).join('');
+}
+
+/* ═══════════════════════════════════════════════════
+   CHARTS
+═══════════════════════════════════════════════════ */
+function buildApiChart() {
+  new Chart(document.getElementById('apiChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Predictions', 'Market data', 'Portfolio'],
+      datasets: [{ data: [45, 32, 23], backgroundColor: ['#3d7fff', '#10c98a', '#f5c542'], borderWidth: 0, hoverOffset: 6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor: 'rgba(17,21,32,0.95)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 10 }
+      },
+      cutout: '65%'
+    }
+  });
+}
+
+function buildPlaceholderSignupChart() {
+  const labels = getLast30DayLabels();
+  let v = 18;
+  const data = labels.map(() => { v = Math.max(1, Math.round(v + (Math.random() - 0.4) * 5)); return v; });
+  buildSignupChartWith(labels, data);
+}
+
+function buildRealSignupChart(users) {
+  const keys = getLast30DayKeys(), labels = getLast30DayLabels();
+  const counts = {}; keys.forEach(k => counts[k] = 0);
+  users.forEach(u => { const d = String(u.created_at || '').slice(0, 10); if (counts[d] !== undefined) counts[d]++; });
+  buildSignupChartWith(labels, keys.map(k => counts[k]));
+}
+
+function getLast30DayKeys() {
+  return Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - 29 + i);
+    return d.toLocaleDateString('en-CA');
+  });
+}
+function getLast30DayLabels() {
+  return Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - 29 + i);
+    return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+  });
+}
+
+function buildSignupChartWith(labels, data) {
+  const canvas = document.getElementById('signupChart');
+  const existing = Chart.getChart(canvas); if (existing) existing.destroy();
+  new Chart(canvas, {
+    type: 'bar',
+    data: { labels, datasets: [{ data, backgroundColor: 'rgba(61,127,255,0.5)', borderRadius: 3, hoverBackgroundColor: 'rgba(61,127,255,0.8)' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: 'rgba(17,21,32,0.95)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 10,
+          callbacks: { label: item => ` ${item.raw} new user${item.raw !== 1 ? 's' : ''}` }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { maxTicksLimit: 6 } },
+        y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { stepSize: 1 } }
+      }
+    }
+  });
+}
+
+function buildModelChart() {
+  const lbs = Array.from({ length: 12 }, (_, i) => {
+    const d = new Date(); d.setMonth(d.getMonth() - 11 + i);
+    return d.toLocaleDateString('en', { month: 'short' });
+  });
+  new Chart(document.getElementById('modelChart'), {
+    type: 'line',
+    data: {
+      labels: lbs,
+      datasets: [
+        { label: 'v2.2', data: [68,69,70,71,70,72,73,72,74,73,74,74.2], borderColor: '#10c98a', borderWidth: 2, pointRadius: 2, tension: 0.3, fill: false },
+        { label: 'v2.3β', data: [null,null,null,null,null,null,null,null,null,75,76,77.8], borderColor: '#f5c542', borderWidth: 2, borderDash: [4,3], pointRadius: 2, tension: 0.3, fill: false }
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(17,21,32,0.95)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 10 } },
+      scales: {
+        x: { grid: { display: false }, ticks: { font: { size: 10 } } },
+        y: { min: 65, grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { callback: v => v + '%' } }
+      }
+    }
+  });
+}
+
+/* ═══════════════════════════════════════════════════
+   USERS — CRUD
+═══════════════════════════════════════════════════ */
+async function loadUsers() {
+  document.getElementById('userTbody').innerHTML = '<tr><td colspan="7" class="loading-row"><span class="spinner"></span>&nbsp; Loading users…</td></tr>';
+  try {
+    const res = await fetch(`${AUTH_API}/auth/users`, { headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if (res.ok) { _users = await res.json(); renderUsers(_users); return; }
+  } catch(e) {}
+  _users = [...DEMO_USERS];
+  renderUsers(_users);
+}
+
+function renderUsers(list) {
+  if (!list || !list.length) {
+    document.getElementById('userTbody').innerHTML = '<tr><td colspan="7"><div class="empty-state"><div class="es-icon">👥</div><p>No users found.</p></div></td></tr>';
+    return;
+  }
+  const me = JSON.parse(localStorage.getItem('nepseraUser') || '{}');
+  document.getElementById('userTbody').innerHTML = list.map(u => {
+    const isSelf = u.email === me.email;
+    const suspendLabel = u.is_active ? 'Suspend' : 'Reactivate';
+    return `<tr style="${!u.is_active ? 'opacity:.6' : ''}">
+      <td style="color:var(--text3);padding-left:20px;font-family:'JetBrains Mono',monospace;font-size:11px;">${u.id}</td>
+      <td style="font-weight:600;">${u.name}${isSelf ? '<span style="font-size:10px;color:var(--gold);margin-left:6px;">(you)</span>' : ''}</td>
+      <td style="color:var(--text2);">${u.email}</td>
+      <td><span class="bdg ${u.role === 'admin' ? 'bdg-a' : 'bdg-y'}">${u.role}</span></td>
+      <td><span class="bdg ${u.is_active ? 'bdg-g' : 'bdg-r'}">${u.is_active ? 'Active' : 'Suspended'}</span></td>
+      <td style="color:var(--text3);font-size:11px;">${u.created_at ? String(u.created_at).slice(0, 10) : '—'}</td>
+      <td style="white-space:nowrap;">
+        <button class="act-btn" onclick="openEditUserModal(${u.id})">Edit</button>
+        <button class="act-btn ${u.is_active ? 'danger' : ''}" onclick="openSuspendModal(${u.id})" ${isSelf ? 'disabled' : ''}>${suspendLabel}</button>
+        <button class="act-btn danger" onclick="openDeleteUserModal(${u.id},'${u.name.replace(/'/g, "\\'")}')" ${isSelf ? 'disabled' : ''}>Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterUsers() {
+  const q = document.getElementById('userSearch').value.toLowerCase();
+  const r = document.getElementById('roleFilter').value;
+  const s = document.getElementById('statusFilter').value;
+  renderUsers(_users.filter(u =>
+    (!q || (u.name + u.email).toLowerCase().includes(q)) &&
+    (!r || u.role === r) &&
+    (!s || (s === 'Active' ? u.is_active : !u.is_active))
+  ));
+}
+
+function openAddUserModal() {
+  clearUserForm();
+  _editingUserId = null;
+  document.getElementById('userModalTitle').textContent = 'Add New User';
+  document.getElementById('userSaveTxt').textContent = 'Add User';
+  document.getElementById('uf_pw_required').style.display = 'inline';
+  document.getElementById('uf_pw_hint').style.display = 'none';
+  document.getElementById('uf_email').removeAttribute('readonly');
+  hideModalError('userModalError');
+  openModal('userModal');
+}
+
+function openEditUserModal(id) {
+  const u = _users.find(x => x.id === id);
+  if (!u) { showToast('User not found', 'error'); return; }
+  _editingUserId = id;
+  document.getElementById('userModalTitle').textContent = `Edit — ${u.name}`;
+  document.getElementById('userSaveTxt').textContent = 'Save Changes';
+  document.getElementById('uf_name').value  = u.name || '';
+  document.getElementById('uf_email').value = u.email || '';
+  document.getElementById('uf_role').value  = u.role || 'user';
+  document.getElementById('uf_password').value = '';
+  document.getElementById('uf_pw_required').style.display = 'none';
+  document.getElementById('uf_pw_hint').style.display = 'block';
+  hideModalError('userModalError');
+  openModal('userModal');
+}
+
+async function saveUser() {
+  hideModalError('userModalError');
+  const name     = document.getElementById('uf_name').value.trim();
+  const email    = document.getElementById('uf_email').value.trim().toLowerCase();
+  const role     = document.getElementById('uf_role').value;
+  const password = document.getElementById('uf_password').value;
+  const isEdit   = !!_editingUserId;
+
+  if (!name)  { showModalError('userModalError', 'Full name is required.'); return; }
+  if (!email) { showModalError('userModalError', 'Email address is required.'); return; }
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { showModalError('userModalError', 'Enter a valid email address.'); return; }
+  if (!isEdit && !password) { showModalError('userModalError', 'Password is required for new users.'); return; }
+  if (password && password.length < 8) { showModalError('userModalError', 'Password must be at least 8 characters.'); return; }
+
+  const btn = document.getElementById('userSaveBtn');
+  btn.disabled = true;
+  document.getElementById('userSaveTxt').textContent = 'Saving…';
+
+  const payload = { name, email, role }; if (password) payload.password = password;
+  try {
+    const url = isEdit ? `${AUTH_API}/auth/users/${_editingUserId}` : `${AUTH_API}/auth/users`;
+    const res = await fetch(url, { method: isEdit ? 'PUT' : 'POST', headers: { 'Authorization': 'Bearer ' + getToken(), 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+    if (res.ok) {
+      const saved = await res.json();
+      if (isEdit) { _users = _users.map(u => u.id === _editingUserId ? { ...u, ...saved } : u); }
+      else { _users.unshift(saved); }
+      showToast(`${saved.name} ${isEdit ? 'updated' : 'added'}`, 'success');
+      closeModal('userModal'); filterUsers(); btn.disabled = false;
+      document.getElementById('userSaveTxt').textContent = isEdit ? 'Save Changes' : 'Add User'; return;
+    }
+    const err = await res.json().catch(() => ({ detail: 'Request failed' }));
+    showModalError('userModalError', err.detail || JSON.stringify(err));
+  } catch(e) {
+    // Demo fallback
+    if (isEdit) { _users = _users.map(u => u.id === _editingUserId ? { ...u, name, email, role } : u); }
+    else { _users.unshift({ id: _userIdCounter++, name, email, role, is_active: true, created_at: new Date().toISOString() }); }
+    showToast(`${name} ${isEdit ? 'updated' : 'added'} (demo)`, 'success');
+    closeModal('userModal'); filterUsers();
+  }
+  btn.disabled = false;
+  document.getElementById('userSaveTxt').textContent = isEdit ? 'Save Changes' : 'Add User';
+}
+
+function openSuspendModal(id) {
+  const u = _users.find(x => x.id === id); if (!u) return;
+  _suspendingUserId = id;
+  const isSuspended = !u.is_active;
+  document.getElementById('suspendModalTitle').textContent = isSuspended ? 'Reactivate User' : 'Suspend User';
+  document.getElementById('suspendIcon').textContent = isSuspended ? '✅' : '⛔';
+  document.getElementById('suspendMsg').innerHTML = isSuspended ? `Reactivate <strong>${u.name}</strong>?` : `Suspend <strong>${u.name}</strong>?`;
+  document.getElementById('suspendSubMsg').textContent = isSuspended
+    ? 'This will restore their access immediately.'
+    : 'This will immediately block them from logging in. Their data is preserved.';
+  document.getElementById('suspendEffects').innerHTML = isSuspended
+    ? '• Login restored immediately<br>• Full platform access returned<br>• Portfolio &amp; data intact'
+    : '• Login blocked immediately<br>• Active sessions invalidated<br>• Portfolio &amp; data preserved<br>• Can be reactivated by admin';
+  document.getElementById('suspendBtnTxt').textContent = isSuspended ? 'Reactivate User' : 'Suspend User';
+  document.getElementById('suspendConfirmBtn').className = isSuspended ? 'add-btn green' : 'add-btn danger';
+  openModal('suspendModal');
+}
+
+async function confirmSuspend() {
+  const id = _suspendingUserId;
+  try {
+    const res = await fetch(`${AUTH_API}/auth/users/${id}/suspend`, { method: 'PATCH', headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if (res.ok) {
+      const updated = await res.json();
+      _users = _users.map(u => u.id === id ? { ...u, ...updated } : u);
+      showToast(`User ${updated.is_active ? 'reactivated' : 'suspended'}`, updated.is_active ? 'success' : 'info');
+      closeModal('suspendModal'); filterUsers(); return;
+    }
+  } catch(e) {}
+  _users = _users.map(u => u.id === id ? { ...u, is_active: !u.is_active } : u);
+  const updated = _users.find(u => u.id === id);
+  showToast(`User ${updated.is_active ? 'reactivated' : 'suspended'} (demo)`, updated.is_active ? 'success' : 'info');
+  closeModal('suspendModal'); filterUsers();
+}
+
+function openDeleteUserModal(id, name) {
+  _deletingUserId = id;
+  document.getElementById('deleteUserName').textContent = name;
+  openModal('deleteUserModal');
+}
+
+async function confirmDeleteUser() {
+  const id = _deletingUserId;
+  try {
+    const res = await fetch(`${AUTH_API}/auth/users/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if (res.ok || res.status === 204) {
+      _users = _users.filter(u => u.id !== id);
+      showToast('User deleted', 'success'); closeModal('deleteUserModal'); filterUsers(); return;
+    }
+  } catch(e) {}
+  _users = _users.filter(u => u.id !== id);
+  showToast('User deleted (demo)', 'success'); closeModal('deleteUserModal'); filterUsers();
+}
+
+function clearUserForm() {
+  ['uf_name', 'uf_email', 'uf_password'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('uf_role').value = 'user';
+}
+
+function togglePwVis() {
+  const inp = document.getElementById('uf_password');
+  const btn = document.getElementById('pwEyeBtn');
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else { inp.type = 'password'; btn.textContent = '👁'; }
+}
+
+/* ═══════════════════════════════════════════════════
+   STOCKS — CRUD
+═══════════════════════════════════════════════════ */
+async function loadStocks() {
+  document.getElementById('stockTbody').innerHTML = '<tr><td colspan="10" class="loading-row"><span class="spinner"></span>&nbsp; Loading stocks…</td></tr>';
+  try {
+    const res = await fetch(`${API}/stocks/`, { headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if (res.ok) {
+      const data = await res.json();
+      _stocks = Array.isArray(data) ? data : (data.items || data.stocks || []);
+      renderStocks(_stocks); updateStockMetrics(_stocks); return;
+    }
+  } catch(e) {}
+  _stocks = [...DEMO_STOCKS];
+  renderStocks(_stocks); updateStockMetrics(_stocks);
+}
+
+function updateStockMetrics(list) {
+  const live = list.filter(s => s.status === 'live').length;
+  const stale = list.filter(s => s.status === 'stale' || s.status === 'delayed').length;
+  document.getElementById('smTotal').textContent = list.length;
+  document.getElementById('smLive').textContent  = live;
+  document.getElementById('smStale').textContent = stale;
+  document.getElementById('smSync').textContent  = new Date().toLocaleTimeString('en', { hour: '2-digit', minute: '2-digit' });
+  document.getElementById('smSyncStatus').textContent = 'Successful';
+  document.getElementById('stockCount').textContent = `Showing ${list.length} stock${list.length !== 1 ? 's' : ''}`;
+}
+
+function statusBadge(s) {
+  const map   = { live: 'bdg-g', delayed: 'bdg-a', stale: 'bdg-r', inactive: 'bdg-y' };
+  const label = { live: 'Live', delayed: 'Delayed', stale: 'Stale', inactive: 'Inactive' };
+  return `<span class="bdg ${map[s] || 'bdg-y'}">${label[s] || s}</span>`;
+}
+
+function renderStocks(list) {
+  if (!list || !list.length) {
+    document.getElementById('stockTbody').innerHTML = '<tr><td colspan="10"><div class="empty-state"><div class="es-icon">📊</div><p>No stocks found.</p></div></td></tr>';
+    document.getElementById('stockCount').textContent = 'Showing 0 stocks'; return;
+  }
+  document.getElementById('stockCount').textContent = `Showing ${list.length} stock${list.length !== 1 ? 's' : ''}`;
+  document.getElementById('stockTbody').innerHTML = list.map(s => {
+    const chg = parseFloat(s.change_pct) || 0;
+    const chgColor = chg > 0 ? 'var(--green)' : chg < 0 ? 'var(--red)' : 'var(--text2)';
+    const chgArrow = chg > 0 ? '▲' : chg < 0 ? '▼' : '';
+    return `<tr>
+      <td style="font-weight:700;font-family:'JetBrains Mono',monospace;padding-left:20px;color:var(--accent2);">${s.symbol}</td>
+      <td style="color:var(--text2);max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${s.company}">${s.company}</td>
+      <td style="color:var(--text3);">${s.sector || '—'}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-weight:600;">${fmtNum(s.ltp, 2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:${chgColor};">${chgArrow} ${Math.abs(chg).toFixed(2)}%</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--green);">${fmtNum(s.high_52w, 2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;color:var(--red);">${fmtNum(s.low_52w, 2)}</td>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--text3);">${s.volume ? fmtNum(s.volume) : '—'}</td>
+      <td>${statusBadge(s.status || 'live')}</td>
+      <td style="white-space:nowrap;">
+        <button class="act-btn" onclick="openEditStockModal(${s.id})">Edit</button>
+        <button class="act-btn" onclick="openHistoryModal('${s.symbol}')">History</button>
+        <button class="act-btn danger" onclick="openDeleteConfirm(${s.id},'${s.symbol}')">Delete</button>
+      </td>
+    </tr>`;
+  }).join('');
+}
+
+function filterStocks() {
+  const q   = document.getElementById('stockSearch').value.toLowerCase();
+  const sec = document.getElementById('sectorFilter').value;
+  const st  = document.getElementById('stockStatusFilter').value;
+  const filtered = _stocks.filter(s =>
+    (!q || (s.symbol + s.company).toLowerCase().includes(q)) &&
+    (!sec || s.sector === sec) &&
+    (!st || s.status === st)
+  );
+  renderStocks(filtered);
+  document.getElementById('stockCount').textContent = `Showing ${filtered.length} stock${filtered.length !== 1 ? 's' : ''}`;
+}
+
+async function syncStockData() {
+  showToast('Syncing live data from NEPSE…', 'info', 2000);
+  try {
+    const res = await fetch(`${API}/stocks/sync`, { method: 'POST', headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if (res.ok) { showToast('Data synced successfully', 'success'); loadStocks(); return; }
+  } catch(e) {}
+  setTimeout(() => { showToast('Sync complete — demo data refreshed', 'success'); loadStocks(); }, 1200);
+}
+
+function openAddStockModal() {
+  clearStockForm(); _editingStockId = null;
+  document.getElementById('stockModalTitle').textContent = 'Add New Stock';
+  document.getElementById('stockSaveTxt').textContent = 'Add Stock';
+  document.getElementById('sf_symbol').removeAttribute('readonly');
+  hideModalError('stockModalError');
+  openModal('stockModal');
+}
+
+function openEditStockModal(id) {
+  const s = _stocks.find(x => x.id === id);
+  if (!s) { showToast('Stock not found', 'error'); return; }
+  _editingStockId = id;
+  document.getElementById('stockModalTitle').textContent = `Edit — ${s.symbol}`;
+  document.getElementById('stockSaveTxt').textContent = 'Save Changes';
+  document.getElementById('sf_symbol').value = s.symbol || '';
+  document.getElementById('sf_symbol').setAttribute('readonly', 'true');
+  document.getElementById('sf_company').value = s.company || '';
+  document.getElementById('sf_sector').value = s.sector || '';
+  document.getElementById('sf_ltp').value = s.ltp !== null && s.ltp !== undefined ? s.ltp : '';
+  document.getElementById('sf_change_pct').value = s.change_pct !== null && s.change_pct !== undefined ? s.change_pct : '';
+  document.getElementById('sf_high_52w').value = s.high_52w || '';
+  document.getElementById('sf_low_52w').value = s.low_52w || '';
+  document.getElementById('sf_volume').value = s.volume || '';
+  document.getElementById('sf_market_cap').value = s.market_cap || '';
+  document.getElementById('sf_listed_shares').value = s.listed_shares || '';
+  document.getElementById('sf_status').value = s.status || 'live';
+  document.getElementById('sf_notes').value = s.notes || '';
+  hideModalError('stockModalError');
+  openModal('stockModal');
+}
+
+async function saveStock() {
+  hideModalError('stockModalError');
+  
+  // Get form values
+  const symbol = document.getElementById('sf_symbol').value.trim().toUpperCase();
+  const company = document.getElementById('sf_company').value.trim();
+  const sector = document.getElementById('sf_sector').value;
+  const status = document.getElementById('sf_status').value;
+  const notes = document.getElementById('sf_notes').value.trim();
+  
+  // Validation - check required fields
+  if (!symbol) { 
+    showModalError('stockModalError', '❌ Stock symbol is required.'); 
+    return; 
+  }
+  if (!company) { 
+    showModalError('stockModalError', '❌ Company name is required.'); 
+    return; 
+  }
+  if (!sector) { 
+    showModalError('stockModalError', '❌ Please select a sector.'); 
+    return; 
+  }
+  
+  // Helper function to safely parse numbers
+  const parseNumber = (id, defaultValue = null) => {
+    const value = document.getElementById(id).value.trim();
+    if (value === '') return defaultValue;
+    const num = parseFloat(value);
+    return isNaN(num) ? defaultValue : num;
   };
-})();
+  
+  const parseIntValue = (id, defaultValue = null) => {
+    const value = document.getElementById(id).value.trim();
+    if (value === '') return defaultValue;
+    const num = parseInt(value);
+    return isNaN(num) ? defaultValue : num;
+  };
+  
+  // Get current date for trade_date (format: YYYY-MM-DD or ISO string)
+  const today = new Date();
+  const tradeDate = today.toISOString().split('T')[0]; // Format: YYYY-MM-DD
+  
+  // Build payload with REQUIRED trade_date field
+  const payload = {
+    symbol: symbol,
+    company: company,
+    sector: sector,
+    trade_date: tradeDate,  // ⭐ CRITICAL: Add this required field
+    ltp: parseNumber('sf_ltp', 0),
+    change_pct: parseNumber('sf_change_pct', 0),
+    high_52w: parseNumber('sf_high_52w', 0),
+    low_52w: parseNumber('sf_low_52w', 0),
+    volume: parseIntValue('sf_volume', 0),
+    market_cap: parseNumber('sf_market_cap', null),
+    listed_shares: parseIntValue('sf_listed_shares', null),
+    status: status,
+    notes: notes,
+    last_updated: new Date().toISOString(),
+    is_active: true
+  };
+  
+  // Remove null values to avoid backend validation issues
+  Object.keys(payload).forEach(key => {
+    if (payload[key] === null || payload[key] === undefined) {
+      delete payload[key];
+    }
+  });
+  
+  // Log the payload for debugging
+  console.log('📤 Sending stock payload:', payload);
+  
+  const isEdit = !!_editingStockId;
+  const btn = document.getElementById('stockSaveBtn');
+  const originalText = document.getElementById('stockSaveTxt').textContent;
+  
+  // Disable button and show loading state
+  btn.disabled = true;
+  document.getElementById('stockSaveTxt').textContent = isEdit ? 'Updating...' : 'Adding...';
+  
+  try {
+    const url = isEdit ? `${API}/stocks/${_editingStockId}` : `${API}/stocks/`;
+    const method = isEdit ? 'PUT' : 'POST';
+    
+    console.log(`📡 ${method} request to:`, url);
+    
+    const response = await fetch(url, {
+      method: method,
+      headers: {
+        'Authorization': 'Bearer ' + getToken(),
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    console.log('📥 Response status:', response.status, response.statusText);
+    
+    // Handle successful response
+    if (response.ok) {
+      let savedStock;
+      const contentType = response.headers.get('content-type');
+      
+      if (contentType && contentType.includes('application/json')) {
+        savedStock = await response.json();
+        console.log('✅ Stock saved successfully:', savedStock);
+      } else {
+        savedStock = { ...payload, id: isEdit ? _editingStockId : Date.now() };
+        console.log('✅ Stock saved (no JSON response):', savedStock);
+      }
+      
+      // Update local stocks array
+      if (isEdit) {
+        const index = _stocks.findIndex(s => s.id === _editingStockId);
+        if (index !== -1) {
+          _stocks[index] = { ..._stocks[index], ...savedStock, ...payload };
+        } else {
+          _stocks = _stocks.map(s => s.id === _editingStockId ? { ...s, ...savedStock, ...payload } : s);
+        }
+        showToast(`✅ Stock ${symbol} updated successfully!`, 'success');
+      } else {
+        const newStock = { 
+          id: savedStock.id || Date.now(), 
+          ...payload, 
+          ...savedStock,
+          created_at: new Date().toISOString() 
+        };
+        _stocks.unshift(newStock);
+        showToast(`✅ Stock ${symbol} added successfully!`, 'success');
+      }
+      
+      // Close modal and refresh UI
+      closeModal('stockModal');
+      filterStocks();
+      updateStockMetrics(_stocks);
+      clearStockForm();
+      
+    } else {
+      // Handle error responses
+      let errorMessage = '';
+      let errorDetails = null;
+      
+      try {
+        errorDetails = await response.json();
+        console.error('❌ API Error Response:', errorDetails);
+        
+        if (errorDetails.detail) {
+          if (typeof errorDetails.detail === 'string') {
+            errorMessage = errorDetails.detail;
+          } else if (Array.isArray(errorDetails.detail)) {
+            errorMessage = errorDetails.detail.map(err => {
+              const field = err.loc?.join('.') || 'unknown';
+              const msg = err.msg || 'Invalid value';
+              return `${field}: ${msg}`;
+            }).join('; ');
+          } else {
+            errorMessage = JSON.stringify(errorDetails.detail);
+          }
+        } else if (errorDetails.message) {
+          errorMessage = errorDetails.message;
+        } else {
+          errorMessage = 'Unknown validation error';
+        }
+      } catch (e) {
+        errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+      }
+      
+      if (response.status === 422) {
+        showModalError('stockModalError', `❌ Validation Error:\n${errorMessage}\n\nPlease check all required fields (trade_date is required).`);
+      } else if (response.status === 409) {
+        showModalError('stockModalError', `❌ Stock with symbol "${symbol}" already exists.`);
+      } else if (response.status === 401 || response.status === 403) {
+        showModalError('stockModalError', `❌ Authentication error. Please refresh the page.`);
+      } else {
+        showModalError('stockModalError', `❌ Error ${response.status}: ${errorMessage}`);
+      }
+    }
+    
+  } catch (error) {
+    console.error('🌐 Network error:', error);
+    showModalError('stockModalError', 
+      `❌ Network error: ${error.message}\n\n` +
+      `Please check:\n` +
+      `1. Backend server is running on ${API}\n` +
+      `2. You have a valid authentication token`
+    );
+  } finally {
+    btn.disabled = false;
+    document.getElementById('stockSaveTxt').textContent = originalText;
+  }
+}
+
+function openDeleteConfirm(id, symbol) {
+  _deletingStockId = id;
+  document.getElementById('confirmStockName').textContent = symbol;
+  openModal('confirmModal');
+}
+
+async function confirmDeleteStock() {
+  const id = _deletingStockId;
+  try {
+    const res = await fetch(`${API}/stocks/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if (res.ok || res.status === 204) {
+      _stocks = _stocks.filter(s => s.id !== id);
+      showToast('Stock deleted', 'success'); closeModal('confirmModal'); filterStocks(); updateStockMetrics(_stocks); return;
+    }
+  } catch(e) {}
+  _stocks = _stocks.filter(s => s.id !== id);
+  showToast('Stock deleted (demo)', 'success'); closeModal('confirmModal'); filterStocks(); updateStockMetrics(_stocks);
+}
+
+function openHistoryModal(symbol) {
+  document.getElementById('historyModalTitle').textContent = `Price History — ${symbol}`;
+  const rows = []; let price = 800 + Math.random() * 600; const today = new Date();
+  for (let i = 29; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const open = price, high = open * (1 + Math.random() * 0.04), low = open * (1 - Math.random() * 0.04);
+    const close = low + (high - low) * Math.random(), vol = Math.round(10000 + Math.random() * 80000);
+    rows.push({ date: d.toLocaleDateString('en-CA'), open, high, low, close, vol });
+    price = close;
+  }
+  document.getElementById('historyTbody').innerHTML = rows.slice(-10).reverse().map(r => `<tr>
+    <td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:11px;">${r.date}</td>
+    <td style="font-family:'JetBrains Mono',monospace;">${r.open.toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--green);">${r.high.toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--red);">${r.low.toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;font-weight:600;">${r.close.toFixed(2)}</td>
+    <td style="font-family:'JetBrains Mono',monospace;color:var(--text3);">${r.vol.toLocaleString()}</td>
+  </tr>`).join('');
+  if (_historyChartInst) _historyChartInst.destroy();
+  _historyChartInst = new Chart(document.getElementById('historyChart'), {
+    type: 'line',
+    data: { labels: rows.map(r => r.date), datasets: [{ label: 'Close', data: rows.map(r => +r.close.toFixed(2)), borderColor: '#3d7fff', borderWidth: 2, pointRadius: 0, tension: 0.3, fill: true, backgroundColor: 'rgba(61,127,255,0.06)' }] },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { backgroundColor: 'rgba(17,21,32,0.95)', borderColor: 'rgba(255,255,255,0.1)', borderWidth: 1, padding: 10 } },
+      scales: { x: { grid: { display: false }, ticks: { maxTicksLimit: 6, font: { size: 10 } } }, y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { font: { size: 10 } } } }
+    }
+  });
+  openModal('historyModal');
+}
+
+function clearStockForm() {
+  ['sf_symbol','sf_company','sf_ltp','sf_change_pct','sf_high_52w','sf_low_52w','sf_volume','sf_market_cap','sf_listed_shares','sf_notes'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('sf_sector').value = '';
+  document.getElementById('sf_status').value = 'live';
+}
+
+/* ALERTS */
+function resolveAlert(btn, label) {
+  const item = btn.closest('.alert-item');
+  item.style.transition = 'opacity .3s';
+  item.style.opacity = '0';
+  setTimeout(() => item.remove(), 300);
+  showToast('Alert resolved: ' + label, 'success');
+}
+
+function toggleChannel(btn, name) {
+  btn.classList.toggle('on');
+  showToast(name + ' notifications ' + (btn.classList.contains('on') ? 'enabled' : 'disabled'), 'info');
+}
+
+/* AUDIT LOGS */
+function renderLogsTable(logs) {
+  const tbody = document.getElementById('logTbody');
+  if (!tbody) return;
+  tbody.innerHTML = logs.map(l => '<tr>' +
+    '<td style="color:var(--text3);font-family:\'JetBrains Mono\',monospace;font-size:11px;padding-left:20px;">' + l.ts + '</td>' +
+    '<td style="color:' + (l.role==='admin'?'var(--gold)':'var(--accent2)') + ';font-weight:700;">' + l.user + '</td>' +
+    '<td style="color:var(--text2);">' + l.action + '</td>' +
+    '<td style="color:var(--text3);">' + l.resource + '</td>' +
+    '<td style="color:var(--text3);font-family:\'JetBrains Mono\',monospace;font-size:11px;">' + l.ip + '</td>' +
+    '<td><span class="bdg ' + (l.ok?'bdg-g':'bdg-r') + '">' + (l.ok?'OK':'Failed') + '</span></td>' +
+    '</tr>').join('');
+}
+
+function exportLogs() {
+  const rows = [['Timestamp','User','Action','Resource','IP','Status']];
+  DEMO_LOGS.forEach(function(l) { rows.push([l.ts, l.user, l.action, l.resource, l.ip, l.ok?'OK':'Failed']); });
+  const csv = rows.map(function(r) { return r.join(','); }).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv,' + encodeURIComponent(csv);
+  a.download = 'audit_logs.csv';
+  a.click();
+  showToast('Logs exported as CSV', 'success');
+}
 </script>
 </body>
 </html>

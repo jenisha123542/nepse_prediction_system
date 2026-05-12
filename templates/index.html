@@ -269,11 +269,12 @@ footer{background:var(--surface);border-top:1px solid var(--border);margin-top:6
         <div class="hero-chg">▲ 18.42 &nbsp;+0.79% &nbsp;<span style="color:var(--text3);font-weight:400;font-size:13px;">Today</span></div>
       </div>
       <div class="hero-stats">
-        <div class="hero-stat"><div class="hstat-l">Turnover</div><div class="hstat-v" style="color:var(--green);">NPR 3.2B</div></div>
-        <div class="hero-stat"><div class="hstat-l">Shares Traded</div><div class="hstat-v">8.4M</div></div>
-        <div class="hero-stat"><div class="hstat-l">Transactions</div><div class="hstat-v">61,240</div></div>
-        <div class="hero-stat"><div class="hstat-l">52W High</div><div class="hstat-v" style="color:var(--green);">2,647</div></div>
-        <div class="hero-stat"><div class="hstat-l">52W Low</div><div class="hstat-v" style="color:var(--red);">1,846</div></div>
+        <div class="hero-stat"><div class="hstat-l">Turnover</div><div class="hstat-v" style="color:var(--green);" data-stat="turnover">NPR 3.2B</div></div>
+        <div class="hero-stat"><div class="hstat-l">Shares Traded</div><div class="hstat-v" data-stat="vol">8.4M</div></div>
+        <div class="hero-stat"><div class="hstat-l">Transactions</div><div class="hstat-v" data-stat="txn">61,240</div></div>
+        <div class="hero-stat"><div class="hstat-l">52W High</div><div class="hstat-v" style="color:var(--green);" data-stat="high52">2,647</div></div>
+        <div class="hero-stat"><div class="hstat-l">52W Low</div><div class="hstat-v" style="color:var(--red);" data-stat="low52">1,846</div></div>
+        
       </div>
     </div>
     <div class="g2" style="margin-bottom:16px;">
@@ -518,126 +519,536 @@ footer{background:var(--surface);border-top:1px solid var(--border);margin-top:6
     </div>
   </div>
 </footer>
-
 <script>
-(function(){
-  // DATE
-  function tick(){const d=new Date();document.getElementById('dt').textContent=d.toLocaleString('en-NP',{weekday:'short',month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'});}
-  tick();setInterval(tick,60000);
+/* ══════════════════════════════════════════════════
+   GLOBALS — accessible everywhere
+══════════════════════════════════════════════════ */
+const API      = 'http://localhost:8000/api';
+const getToken = () => localStorage.getItem('token') || '';
 
-  // TICKER
-  const tickerData=[
-    {sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},
-    {sym:'NICA',val:'920',chg:'+1.32%',up:true},
-    {sym:'BPCL',val:'595',chg:'+7.40%',up:true},
-    {sym:'UPPER',val:'224',chg:'+9.80%',up:true},
-    {sym:'SHPC',val:'388',chg:'-2.02%',up:false},
-    {sym:'LICN',val:'1,197',chg:'-5.80%',up:false},
-    {sym:'ADBL',val:'376',chg:'-4.10%',up:false},
-    {sym:'SBI',val:'412',chg:'+4.40%',up:true},
-    {sym:'NHPC',val:'318',chg:'+5.80%',up:true},
-    {sym:'PRVU',val:'281',chg:'-2.70%',up:false},
-    {sym:'NGPL',val:'854',chg:'-3.30%',up:false},
-    {sym:'SHINE',val:'143',chg:'-1.90%',up:false},
-  ];
-  const t=document.getElementById('ticker');
-  const makeItems=()=>tickerData.map(d=>`<div class="ticker-item"><span class="sym">${d.sym}</span><span class="val">${d.val}</span><span class="chg ${d.up?'up':'dn'}">${d.chg}</span></div><div class="ticker-sep"></div>`).join('');
-  t.innerHTML=makeItems()+makeItems();
+let _cachedStocks = [];
 
-  // TABS
-  window.showTab=function(id,btn){
-    document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
-    document.getElementById('pane-'+id).classList.add('active');
-    btn.classList.add('active');
-    if(id==='technical'&&!window._taBuilt){buildTaChart('NABIL');window._taBuilt=true;}
-    if(id==='portfolio'&&!window._portBuilt){buildPortChart();window._portBuilt=true;}
-    if(id==='news'&&!window._sentBuilt){buildSentChart();window._sentBuilt=true;}
-    if(id==='predictions'&&!window._predBuilt){buildPredChart();window._predBuilt=true;}
-    if(id==='movers'&&!window._moverBuilt){buildMoverChart();window._moverBuilt=true;}
+function fetchStocks() {
+  if (_cachedStocks.length) return Promise.resolve(_cachedStocks);
+  return fetch(API + '/stocks/', {
+    headers: { 'Authorization': 'Bearer ' + getToken() }
+  })
+  .then(r => r.ok ? r.json() : [])
+  .then(data => {
+    _cachedStocks = Array.isArray(data) ? data : (data.items || data.stocks || []);
+    return _cachedStocks;
+  })
+  .catch(() => _cachedStocks);
+}
+
+function formatVol(v) {
+  if (!v) return '—';
+  if (v >= 1000000) return (v / 1000000).toFixed(1) + 'M';
+  if (v >= 1000)    return (v / 1000).toFixed(0) + 'K';
+  return v.toString();
+}
+
+/* ══════════════════════════════════════════════════
+   CLOCK
+══════════════════════════════════════════════════ */
+function tick() {
+  document.getElementById('dt').textContent = new Date().toLocaleString('en-NP', {
+    weekday: 'short', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit'
+  });
+}
+tick(); setInterval(tick, 60000);
+
+/* ══════════════════════════════════════════════════
+   CHART.JS DEFAULTS
+══════════════════════════════════════════════════ */
+Chart.defaults.color = '#8890a4';
+Chart.defaults.font  = { family: "'DM Sans',sans-serif", size: 11 };
+
+/* ══════════════════════════════════════════════════
+   TICKER TAPE
+══════════════════════════════════════════════════ */
+const FALLBACK_TICKER = [
+  {sym:'NABIL',val:'1,363',chg:'+1.64%',up:true},
+  {sym:'NICA', val:'920',  chg:'+1.32%',up:true},
+  {sym:'BPCL', val:'595',  chg:'+7.40%',up:true},
+  {sym:'UPPER',val:'224',  chg:'+9.80%',up:true},
+  {sym:'SHPC', val:'388',  chg:'-2.02%',up:false},
+  {sym:'LICN', val:'1,197',chg:'-5.80%',up:false},
+  {sym:'ADBL', val:'376',  chg:'-4.10%',up:false},
+  {sym:'SBI',  val:'412',  chg:'+4.40%',up:true},
+  {sym:'NHPC', val:'318',  chg:'+5.80%',up:true},
+  {sym:'PRVU', val:'281',  chg:'-2.70%',up:false},
+];
+
+function buildTicker(stocks) {
+  const data = stocks.length ? stocks.map(s => ({
+    sym: s.symbol,
+    val: Number(s.ltp).toLocaleString(),
+    chg: (s.change_pct >= 0 ? '+' : '') + Number(s.change_pct).toFixed(2) + '%',
+    up:  s.change_pct >= 0
+  })) : FALLBACK_TICKER;
+
+  const t = document.getElementById('ticker');
+  const makeItems = () => data.map(d =>
+    `<div class="ticker-item">
+      <span class="sym">${d.sym}</span>
+      <span class="val">${d.val}</span>
+      <span class="chg ${d.up ? 'up' : 'dn'}">${d.chg}</span>
+    </div><div class="ticker-sep"></div>`
+  ).join('');
+  t.innerHTML = makeItems() + makeItems();
+}
+
+/* ══════════════════════════════════════════════════
+   OVERVIEW — HERO STRIP
+══════════════════════════════════════════════════ */
+function updateHero(stocks) {
+  if (!stocks.length) return 2341;
+
+  const totalLtp      = stocks.reduce((a, s) => a + (Number(s.ltp) || 0), 0);
+  const avgLtp        = totalLtp / stocks.length;
+  const indexVal      = parseFloat((avgLtp * 1.8).toFixed(2));
+  const avgChgPct     = stocks.reduce((a, s) => a + (Number(s.change_pct) || 0), 0) / stocks.length;
+  const chgPts        = parseFloat((indexVal * avgChgPct / 100).toFixed(2));
+  const isUp          = avgChgPct >= 0;
+
+  // Use real turnover from API
+  const totalTurnover = stocks.reduce((a, s) => a + (Number(s.turnover) || 0), 0);
+  const totalVol      = stocks.reduce((a, s) => a + (Number(s.volume)   || 0), 0);
+  const totalTxn      = stocks.reduce((a, s) => a + (Number(s.transactions) || 0), 0);
+
+  document.querySelector('.hero-val').textContent = indexVal.toLocaleString();
+  document.querySelector('.hero-chg').innerHTML =
+    `<span style="color:${isUp ? 'var(--green)' : 'var(--red)'};">
+      ${isUp ? '▲' : '▼'} ${Math.abs(chgPts).toFixed(2)} &nbsp;${isUp ? '+' : ''}${avgChgPct.toFixed(2)}%
+    </span>
+    &nbsp;<span style="color:var(--text3);font-weight:400;font-size:13px;">Today</span>`;
+
+  // Update stat cards using data-stat attributes
+  const set = (stat, val) => {
+    const el = document.querySelector(`.hstat-v[data-stat="${stat}"]`);
+    if (el) el.textContent = val;
   };
 
-  const chartDefaults={color:'#8890a4',font:{family:"'DM Sans',sans-serif",size:11}};
-  Chart.defaults.color=chartDefaults.color;
-  Chart.defaults.font=chartDefaults.font;
+  set('turnover', 'NPR ' + (totalTurnover / 1e9).toFixed(2) + 'B');
+  set('vol',      (totalVol / 1e6).toFixed(1) + 'M');
+  set('txn',      totalTxn.toLocaleString());
 
-  // INDEX CHART
-  const days30=Array.from({length:30},(_,i)=>{const d=new Date();d.setDate(d.getDate()-29+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
-  let b=2200;const idxD=days30.map(()=>{b+=4+(Math.random()-.38)*20;return Math.round(b);});idxD[29]=2341;
-  new Chart(document.getElementById('idxChart'),{type:'line',data:{labels:days30,datasets:[{data:idxD,borderColor:'#3d7fff',borderWidth:2,fill:true,backgroundColor:(ctx)=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(61,127,255,0.18)');g.addColorStop(1,'rgba(61,127,255,0)');return g;},pointRadius:0,tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{mode:'index',intersect:false,backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#8890a4',bodyColor:'#e8eaf0',padding:10}},scales:{x:{grid:{display:false,drawBorder:false},ticks:{maxTicksLimit:6}},y:{grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},ticks:{callback:v=>v.toLocaleString()}}}}});
-  new Chart(document.getElementById('secChart'),{type:'bar',data:{labels:['Hydropower','Banking','Finance','Insurance','Mfg.'],datasets:[{data:[3.4,2.1,1.2,-0.8,-1.5],backgroundColor:ctx=>ctx.raw>=0?'rgba(16,201,138,0.7)':'rgba(240,82,82,0.7)',borderRadius:4,borderSkipped:false}]},options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,callbacks:{label:ctx=>ctx.raw+'%'}}},scales:{x:{grid:{display:false,drawBorder:false},ticks:{callback:v=>v+'%'}},y:{grid:{display:false,drawBorder:false}}}}});
+  const max52 = Math.max(...stocks.map(s => Number(s.high_52w) || 0));
+  const min52 = Math.min(...stocks.filter(s => s.low_52w).map(s => Number(s.low_52w)));
 
-  function buildPredChart(){
-    new Chart(document.getElementById('predChart'),{type:'line',data:{labels:['D1','D2','D3','D4','D5','D6','D7'],datasets:[{label:'Actual',data:[1363,1370,1378,1385,null,null,null],borderColor:'#3d7fff',borderWidth:2.5,pointRadius:4,pointBackgroundColor:'#3d7fff',tension:0.3,spanGaps:false},{label:'Predicted',data:[null,null,null,1385,1392,1405,1420],borderColor:'#10c98a',borderWidth:2.5,borderDash:[6,4],pointRadius:4,pointBackgroundColor:'#10c98a',tension:0.3,spanGaps:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#8890a4',boxWidth:12,boxHeight:2,padding:16,font:{size:12}}}},scales:{x:{grid:{display:false,drawBorder:false}},y:{grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},ticks:{callback:v=>v.toLocaleString()}}}}});
-  }
-  function buildMoverChart(){
-    new Chart(document.getElementById('moverChart'),{type:'bar',data:{labels:['UPPER','BPCL','NHPC','SBI','NABIL','LICN','ADBL','NGPL','PRVU','SHINE'],datasets:[{data:[1200,840,620,430,310,-280,-510,-190,-370,-220],backgroundColor:ctx=>ctx.raw>=0?'rgba(16,201,138,0.75)':'rgba(240,82,82,0.75)',borderRadius:4,borderSkipped:false}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},scales:{x:{grid:{display:false,drawBorder:false}},y:{grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},ticks:{callback:v=>Math.abs(v)+'K'}}}}});
-  }
-  function buildPortChart(){
-    new Chart(document.getElementById('portChart'),{type:'doughnut',data:{labels:['Banking','Hydropower','Insurance','Finance'],datasets:[{data:[38,28,18,16],backgroundColor:['#185fa5','#0f6e56','#993c1d','#ba7517'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,callbacks:{label:ctx=>ctx.label+': '+ctx.parsed+'%'}}},cutout:'68%'}});
-  }
-  function buildSentChart(){
-    new Chart(document.getElementById('sentChart'),{type:'doughnut',data:{labels:['Positive','Negative','Neutral'],datasets:[{data:[60,25,15],backgroundColor:['#10c98a','#f05252','#545e75'],borderWidth:0,hoverOffset:6}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10,callbacks:{label:ctx=>ctx.label+': '+ctx.parsed+'%'}}},cutout:'68%'}});
+  set('high52', max52.toLocaleString());
+  set('low52',  min52.toLocaleString());
+
+  return indexVal;
+}
+
+/* ══════════════════════════════════════════════════
+   OVERVIEW — QUICK MOVERS TABLE
+══════════════════════════════════════════════════ */
+function updateMovers(stocks) {
+  if (!stocks.length) return;
+  const top4  = [...stocks].sort((a, b) => Math.abs(b.change_pct) - Math.abs(a.change_pct)).slice(0, 4);
+  const tbody = document.querySelector('#pane-overview .tbl tbody');
+  if (!tbody) return;
+  tbody.innerHTML = top4.map(s => {
+    const pct  = Number(s.change_pct);
+    const isUp = pct >= 0;
+    return `<tr>
+      <td style="font-weight:700;font-family:'JetBrains Mono',monospace;">${s.symbol}</td>
+      <td>NPR ${Number(s.ltp).toLocaleString()}</td>
+      <td><span class="bdg ${isUp ? 'bdg-u' : 'bdg-d'}">${isUp ? '+' : ''}${pct.toFixed(1)}%</span></td>
+    </tr>`;
+  }).join('');
+}
+
+/* ══════════════════════════════════════════════════
+   OVERVIEW — AI SIGNAL CARD
+══════════════════════════════════════════════════ */
+function updateSignal(stocks) {
+  if (!stocks.length) return;
+  const avgChg  = stocks.reduce((a, s) => a + (Number(s.change_pct) || 0), 0) / stocks.length;
+  const gainers = stocks.filter(s => s.change_pct > 0).length;
+  const losers  = stocks.filter(s => s.change_pct < 0).length;
+
+  let signal, signalColor, desc;
+  if      (avgChg >  1.5) { signal = 'Strongly Bullish';   signalColor = 'var(--green)'; desc = `${gainers} of ${stocks.length} stocks gaining. Strong upward momentum.`; }
+  else if (avgChg >  0.3) { signal = 'Moderately Bullish'; signalColor = 'var(--green)'; desc = `${gainers} gainers vs ${losers} losers. Selective sector strength.`; }
+  else if (avgChg > -0.3) { signal = 'Neutral';             signalColor = 'var(--gold)';  desc = `Market consolidating — ${gainers} gainers and ${losers} losers in balance.`; }
+  else if (avgChg > -1.5) { signal = 'Moderately Bearish'; signalColor = 'var(--red)';   desc = `${losers} stocks declining. Caution — watch support levels.`; }
+  else                     { signal = 'Strongly Bearish';   signalColor = 'var(--red)';   desc = `Broad selloff — ${losers} of ${stocks.length} stocks in the red.`; }
+
+  const card = document.querySelector('#pane-overview .g2e .card:last-child');
+  if (!card) return;
+  const titleEl = card.querySelector('div[style*="DM Serif"]');
+  const descEl  = card.querySelector('div[style*="line-height"]');
+  const confEl  = card.querySelector('div[style*="color:var(--gold)"]');
+  if (titleEl) { titleEl.textContent = signal; titleEl.style.color = signalColor; }
+  if (descEl)  { descEl.textContent  = desc; }
+  if (confEl)  { confEl.textContent  = Math.min(95, Math.max(55, Math.round(60 + Math.abs(avgChg) * 8))) + '%'; }
+}
+
+/* ══════════════════════════════════════════════════
+   OVERVIEW — INDEX CHART
+══════════════════════════════════════════════════ */
+function buildIndexChart(indexVal) {
+  const days30 = Array.from({ length: 30 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - 29 + i);
+    return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+  });
+  let b = indexVal * 0.93;
+  const data = days30.map((_, i) => {
+    b += (indexVal - b) / (30 - i) + (Math.random() - 0.42) * 12;
+    return Math.round(b);
+  });
+  data[29] = Math.round(indexVal);
+
+  const existing = Chart.getChart('idxChart');
+  if (existing) existing.destroy();
+
+  new Chart(document.getElementById('idxChart'), {
+    type: 'line',
+    data: {
+      labels: days30,
+      datasets: [{
+        data,
+        borderColor: '#3d7fff', borderWidth: 2,
+        fill: true,
+        backgroundColor: ctx => {
+          const g = ctx.chart.ctx.createLinearGradient(0, 0, 0, 200);
+          g.addColorStop(0, 'rgba(61,127,255,0.18)');
+          g.addColorStop(1, 'rgba(61,127,255,0)');
+          return g;
+        },
+        pointRadius: 0, tension: 0.4
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { mode:'index', intersect:false, backgroundColor:'rgba(17,21,32,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, titleColor:'#8890a4', bodyColor:'#e8eaf0', padding:10 }
+      },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ maxTicksLimit:6 } },
+        y: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => v.toLocaleString() } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   OVERVIEW — SECTOR CHART
+══════════════════════════════════════════════════ */
+const SECTOR_MAP = {
+  NABIL:'Banking', NICA:'Banking', ADBL:'Banking', SBI:'Banking', PRVU:'Banking',
+  SANB:'Banking',  CZBIL:'Banking', EBL:'Banking', KBL:'Banking', MBL:'Banking',
+  BPCL:'Hydropower', UPPER:'Hydropower', SHPC:'Hydropower', NHPC:'Hydropower',
+  RRHP:'Hydropower', RHPL:'Hydropower', GHL:'Hydropower', KPCL:'Hydropower',
+  LICN:'Insurance', NGPL:'Insurance', NLIC:'Insurance', SLICL:'Insurance',
+  SHINE:'Finance', MERO:'Finance', CFCL:'Finance', GMFIL:'Finance',
+};
+
+function buildSectorChart(stocks) {
+  const sectorMap = {};
+  stocks.forEach(s => {
+    const sec = SECTOR_MAP[s.symbol] || 'Others';
+    if (!sectorMap[sec]) sectorMap[sec] = [];
+    sectorMap[sec].push(Number(s.change_pct) || 0);
+  });
+
+  const entries = Object.entries(sectorMap)
+    .map(([name, vals]) => ({
+      name,
+      avg: parseFloat((vals.reduce((a, b) => a + b, 0) / vals.length).toFixed(2))
+    }))
+    .sort((a, b) => b.avg - a.avg)
+    .slice(0, 7);
+
+  const labels = entries.map(e => e.name);
+  const data   = entries.map(e => e.avg);
+
+  const existing = Chart.getChart('secChart');
+  if (existing) existing.destroy();
+
+  new Chart(document.getElementById('secChart'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        data,
+        minBarLength: 4,
+        backgroundColor: data.map(v => v >= 0 ? 'rgba(16,201,138,0.7)' : 'rgba(240,82,82,0.7)'),
+        borderRadius: 4,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { backgroundColor:'rgba(17,21,32,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10, callbacks:{ label: ctx => ctx.raw.toFixed(2) + '%' } }
+      },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ callback: v => parseFloat(v.toFixed(2)) + '%' } },
+        y: { grid:{ display:false } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   OVERVIEW — MAIN LOAD
+══════════════════════════════════════════════════ */
+const DEMO_STOCKS = [
+  {symbol:'NABIL', ltp:1363, change_pct:1.64,  volume:310000, turnover:422530000},
+  {symbol:'NICA',  ltp:920,  change_pct:1.32,  volume:210000, turnover:193200000},
+  {symbol:'BPCL',  ltp:595,  change_pct:7.40,  volume:840000, turnover:499800000},
+  {symbol:'UPPER', ltp:224,  change_pct:9.80,  volume:1200000,turnover:268800000},
+  {symbol:'SHPC',  ltp:388,  change_pct:-2.02, volume:180000, turnover:69840000},
+  {symbol:'LICN',  ltp:1197, change_pct:-5.80, volume:280000, turnover:335160000},
+  {symbol:'ADBL',  ltp:376,  change_pct:-4.10, volume:510000, turnover:191760000},
+  {symbol:'SBI',   ltp:412,  change_pct:4.40,  volume:430000, turnover:177160000},
+  {symbol:'NHPC',  ltp:318,  change_pct:5.80,  volume:620000, turnover:197160000},
+  {symbol:'PRVU',  ltp:281,  change_pct:-2.70, volume:370000, turnover:103970000},
+];
+
+async function loadOverview() {
+  let stocks = [];
+  try {
+    const res = await fetch(API + '/stocks/', { headers: { 'Authorization': 'Bearer ' + getToken() } });
+    if (res.ok) {
+      const data = await res.json();
+      stocks = Array.isArray(data) ? data : (data.items || data.stocks || []);
+    }
+  } catch (e) {
+    console.warn('Stock fetch failed, using demo data.', e);
   }
 
-  const stockData={NABIL:{price:'NPR 1,363',chg:'▲ 22.00 (1.64%)',sig:'BUY',sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)',start:1290},NICA:{price:'NPR 920',chg:'▲ 12.00 (1.32%)',sig:'BUY',sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)',start:870},BPCL:{price:'NPR 595',chg:'▲ 41.00 (7.40%)',sig:'BUY',sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)',start:530},SHPC:{price:'NPR 388',chg:'▼ 8.00 (2.02%)',sig:'SELL',sc:'rgba(240,82,82,0.12)',st:'#f05252',bc:'rgba(240,82,82,0.2)',start:410},UPPER:{price:'NPR 224',chg:'▲ 20.00 (9.80%)',sig:'BUY',sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)',start:195}};
-  function buildTaChart(sym){
-    const days=Array.from({length:20},(_,i)=>{const d=new Date();d.setDate(d.getDate()-19+i);return d.toLocaleDateString('en',{month:'short',day:'numeric'});});
-    let p=stockData[sym].start;
-    const closes=days.map(()=>{p=Math.round(p+(Math.random()-.42)*22);return p;});
-    const colors=closes.map((c,i)=>i===0?'rgba(16,201,138,0.7)':(c>=closes[i-1]?'rgba(16,201,138,0.7)':'rgba(240,82,82,0.7)'));
-    if(window._taChart)window._taChart.destroy();
-    window._taChart=new Chart(document.getElementById('taChart'),{type:'bar',data:{labels:days,datasets:[{label:'Price',data:closes,backgroundColor:colors,borderRadius:3,yAxisID:'price'},{label:'Volume',data:days.map(()=>Math.round(40000+Math.random()*90000)),backgroundColor:'rgba(61,127,255,0.1)',yAxisID:'vol',borderRadius:2}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'rgba(17,21,32,0.95)',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,padding:10}},scales:{x:{grid:{display:false,drawBorder:false},ticks:{maxTicksLimit:8}},price:{grid:{color:'rgba(255,255,255,0.04)',drawBorder:false},ticks:{callback:v=>v.toLocaleString()}},vol:{position:'right',grid:{display:false,drawBorder:false},ticks:{color:'rgba(255,255,255,0.2)',callback:v=>(v/1000).toFixed(0)+'k'}}}}});
-  }
-  window.setStock=function(btn,sym){
-    document.querySelectorAll('.stk-tab').forEach(t=>t.classList.remove('active'));btn.classList.add('active');
-    const d=stockData[sym];
-    document.getElementById('ta-price').textContent=d.price;
-    const ce=document.getElementById('ta-chg');ce.textContent=d.chg;ce.className=d.sig==='BUY'?'up':'dn';
-    const se=document.getElementById('ta-sig');se.textContent='Overall: '+d.sig;se.style.background=d.sc;se.style.color=d.st;se.style.borderColor=d.bc;
-    buildTaChart(sym);
-  };
-})();
+  if (!stocks.length) stocks = DEMO_STOCKS;
+  _cachedStocks = stocks;
 
-// AUTH
+  buildTicker(stocks);
+  const indexVal = updateHero(stocks);
+  buildIndexChart(indexVal);
+  buildSectorChart(stocks);
+  updateMovers(stocks);
+  updateSignal(stocks);
+}
+
+loadOverview();
+setInterval(loadOverview, 120000);
+
+/* ══════════════════════════════════════════════════
+   GAINERS & LOSERS
+══════════════════════════════════════════════════ */
+function buildMoverChart() {
+  fetchStocks().then(stocks => {
+    if (!stocks.length) return;
+
+    const sorted  = [...stocks].sort((a, b) => b.change_pct - a.change_pct);
+    const gainers = sorted.filter(s => s.change_pct > 0).slice(0, 5);
+    const losers  = [...stocks].sort((a, b) => a.change_pct - b.change_pct).filter(s => s.change_pct < 0).slice(0, 5);
+
+    document.querySelector('#pane-movers .g2e .card:first-child tbody').innerHTML =
+      gainers.map(s => `<tr>
+        <td style="font-weight:700;font-family:'JetBrains Mono',monospace;">${s.symbol}</td>
+        <td>${Number(s.ltp).toLocaleString()}</td>
+        <td><span class="bdg bdg-u">+${Number(s.change_pct).toFixed(2)}%</span></td>
+        <td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:12px;">${formatVol(s.volume)}</td>
+      </tr>`).join('');
+
+    document.querySelector('#pane-movers .g2e .card:last-child tbody').innerHTML =
+      losers.map(s => `<tr>
+        <td style="font-weight:700;font-family:'JetBrains Mono',monospace;">${s.symbol}</td>
+        <td>${Number(s.ltp).toLocaleString()}</td>
+        <td><span class="bdg bdg-d">${Number(s.change_pct).toFixed(2)}%</span></td>
+        <td style="color:var(--text3);font-family:'JetBrains Mono',monospace;font-size:12px;">${formatVol(s.volume)}</td>
+      </tr>`).join('');
+
+    const chartStocks = [...gainers, ...losers];
+    const labels = chartStocks.map(s => s.symbol);
+    const data   = chartStocks.map(s => parseFloat(Number(s.change_pct).toFixed(2)));
+
+    const existing = Chart.getChart('moverChart');
+    if (existing) existing.destroy();
+
+    new Chart(document.getElementById('moverChart'), {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          data,
+          backgroundColor: data.map(v => v >= 0 ? 'rgba(16,201,138,0.75)' : 'rgba(240,82,82,0.75)'),
+          borderRadius: 4, borderSkipped: false
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+          tooltip: { backgroundColor:'rgba(17,21,32,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10, callbacks:{ label: ctx => ctx.raw.toFixed(2) + '%' } }
+        },
+        scales: {
+          x: { grid:{ display:false } },
+          y: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => parseFloat(v.toFixed(2)) + '%' } }
+        }
+      }
+    });
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   PREDICTIONS CHART (static)
+══════════════════════════════════════════════════ */
+function buildPredChart() {
+  new Chart(document.getElementById('predChart'), {
+    type: 'line',
+    data: {
+      labels: ['D1','D2','D3','D4','D5','D6','D7'],
+      datasets: [
+        {label:'Actual',    data:[1363,1370,1378,1385,null,null,null], borderColor:'#3d7fff', borderWidth:2.5, pointRadius:4, pointBackgroundColor:'#3d7fff', tension:0.3, spanGaps:false},
+        {label:'Predicted', data:[null,null,null,1385,1392,1405,1420], borderColor:'#10c98a', borderWidth:2.5, borderDash:[6,4], pointRadius:4, pointBackgroundColor:'#10c98a', tension:0.3, spanGaps:false}
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:true, labels:{ color:'#8890a4', boxWidth:12, boxHeight:2, padding:16, font:{size:12} } } },
+      scales: {
+        x: { grid:{ display:false } },
+        y: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => v.toLocaleString() } }
+      }
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   PORTFOLIO CHART (static)
+══════════════════════════════════════════════════ */
+function buildPortChart() {
+  new Chart(document.getElementById('portChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Banking','Hydropower','Insurance','Finance'],
+      datasets: [{ data:[38,28,18,16], backgroundColor:['#185fa5','#0f6e56','#993c1d','#ba7517'], borderWidth:0, hoverOffset:6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false }, tooltip:{ backgroundColor:'rgba(17,21,32,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10, callbacks:{ label: ctx => ctx.label + ': ' + ctx.parsed + '%' } } },
+      cutout: '68%'
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   SENTIMENT CHART (static)
+══════════════════════════════════════════════════ */
+function buildSentChart() {
+  new Chart(document.getElementById('sentChart'), {
+    type: 'doughnut',
+    data: {
+      labels: ['Positive','Negative','Neutral'],
+      datasets: [{ data:[60,25,15], backgroundColor:['#10c98a','#f05252','#545e75'], borderWidth:0, hoverOffset:6 }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false }, tooltip:{ backgroundColor:'rgba(17,21,32,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10, callbacks:{ label: ctx => ctx.label + ': ' + ctx.parsed + '%' } } },
+      cutout: '68%'
+    }
+  });
+}
+
+/* ══════════════════════════════════════════════════
+   TECHNICAL ANALYSIS (static data — next to make dynamic)
+══════════════════════════════════════════════════ */
+const stockData = {
+  NABIL: {price:'NPR 1,363',chg:'▲ 22.00 (1.64%)', sig:'BUY', sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)', start:1290},
+  NICA:  {price:'NPR 920',  chg:'▲ 12.00 (1.32%)', sig:'BUY', sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)', start:870},
+  BPCL:  {price:'NPR 595',  chg:'▲ 41.00 (7.40%)', sig:'BUY', sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)', start:530},
+  SHPC:  {price:'NPR 388',  chg:'▼ 8.00 (2.02%)',  sig:'SELL',sc:'rgba(240,82,82,0.12)', st:'#f05252',bc:'rgba(240,82,82,0.2)',  start:410},
+  UPPER: {price:'NPR 224',  chg:'▲ 20.00 (9.80%)', sig:'BUY', sc:'rgba(16,201,138,0.12)',st:'#10c98a',bc:'rgba(16,201,138,0.2)', start:195},
+};
+
+function buildTaChart(sym) {
+  const days = Array.from({ length: 20 }, (_, i) => {
+    const d = new Date(); d.setDate(d.getDate() - 19 + i);
+    return d.toLocaleDateString('en', { month: 'short', day: 'numeric' });
+  });
+  let p = stockData[sym].start;
+  const closes = days.map(() => { p = Math.round(p + (Math.random() - 0.42) * 22); return p; });
+  const colors = closes.map((c, i) => i === 0 ? 'rgba(16,201,138,0.7)' : (c >= closes[i-1] ? 'rgba(16,201,138,0.7)' : 'rgba(240,82,82,0.7)'));
+  if (window._taChart) window._taChart.destroy();
+  window._taChart = new Chart(document.getElementById('taChart'), {
+    type: 'bar',
+    data: {
+      labels: days,
+      datasets: [
+        {label:'Price',  data:closes, backgroundColor:colors, borderRadius:3, yAxisID:'price'},
+        {label:'Volume', data:days.map(() => Math.round(40000 + Math.random() * 90000)), backgroundColor:'rgba(61,127,255,0.1)', yAxisID:'vol', borderRadius:2}
+      ]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend:{ display:false }, tooltip:{ backgroundColor:'rgba(17,21,32,0.95)', borderColor:'rgba(255,255,255,0.1)', borderWidth:1, padding:10 } },
+      scales: {
+        x: { grid:{ display:false }, ticks:{ maxTicksLimit:8 } },
+        price: { grid:{ color:'rgba(255,255,255,0.04)' }, ticks:{ callback: v => v.toLocaleString() } },
+        vol:   { position:'right', grid:{ display:false }, ticks:{ color:'rgba(255,255,255,0.2)', callback: v => (v/1000).toFixed(0) + 'k' } }
+      }
+    }
+  });
+}
+
+function setStock(btn, sym) {
+  document.querySelectorAll('.stk-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  const d = stockData[sym];
+  document.getElementById('ta-price').textContent = d.price;
+  const ce = document.getElementById('ta-chg'); ce.textContent = d.chg; ce.className = d.sig === 'BUY' ? 'up' : 'dn';
+  const se = document.getElementById('ta-sig'); se.textContent = 'Overall: ' + d.sig; se.style.background = d.sc; se.style.color = d.st; se.style.borderColor = d.bc;
+  buildTaChart(sym);
+}
+
+/* ══════════════════════════════════════════════════
+   TAB SWITCHING
+══════════════════════════════════════════════════ */
+function showTab(id, btn) {
+  document.querySelectorAll('.pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('pane-' + id).classList.add('active');
+  btn.classList.add('active');
+  if (id === 'technical'   && !window._taBuilt)   { buildTaChart('NABIL'); window._taBuilt = true; }
+  if (id === 'portfolio'   && !window._portBuilt)  { buildPortChart();     window._portBuilt = true; }
+  if (id === 'news'        && !window._sentBuilt)  { buildSentChart();     window._sentBuilt = true; }
+  if (id === 'predictions' && !window._predBuilt)  { buildPredChart();     window._predBuilt = true; }
+  if (id === 'movers')                             { buildMoverChart(); }
+}
+
+/* ══════════════════════════════════════════════════
+   AUTH
+══════════════════════════════════════════════════ */
 function initAuth() {
   const user = localStorage.getItem('nepseraUser');
-  const btn = document.getElementById('authBtn');
-
-  // Sign In / Account button
+  const btn  = document.getElementById('authBtn');
   if (btn) {
     if (user) {
       const parsed = JSON.parse(user);
       btn.textContent = '👤 ' + (parsed.name || 'Account');
-      btn.style.background = 'rgba(16,201,138,0.1)';
-      btn.style.borderColor = 'rgba(16,201,138,0.3)';
-      btn.style.color = 'var(--green)';
-      btn.onclick = () => {
-        if (confirm('Sign out of NepSera?')) {
-          localStorage.removeItem('nepseraUser');
-          location.reload();
-        }
-      };
+      btn.style.cssText = 'background:rgba(16,201,138,0.1);border-color:rgba(16,201,138,0.3);color:var(--green);';
+      btn.onclick = () => { if (confirm('Sign out of NepSera?')) { localStorage.removeItem('nepseraUser'); location.reload(); } };
     } else {
       btn.textContent = 'Sign In';
-      btn.style.background = 'rgba(61,127,255,0.1)';
-      btn.style.borderColor = 'var(--accent)';
-      btn.style.color = 'var(--accent2)';
+      btn.style.cssText = 'background:rgba(61,127,255,0.1);border-color:var(--accent);color:var(--accent2);';
       btn.onclick = () => { window.location.href = 'signin.html'; };
     }
   }
 
-  // Lock overlay for gated panes
   function gateContent(paneId, featureName, featureDesc) {
     const pane = document.getElementById(paneId);
-    if (!pane) return;
-    if (localStorage.getItem('nepseraUser')) return;
-
+    if (!pane || localStorage.getItem('nepseraUser')) return;
     pane.style.position = 'relative';
     pane.style.minHeight = '400px';
-    const existing = pane.querySelector('.lock-overlay');
-    if (existing) existing.remove();
-
     const overlay = document.createElement('div');
     overlay.className = 'lock-overlay';
     overlay.innerHTML = `
@@ -645,17 +1056,14 @@ function initAuth() {
       <div class="lock-title">${featureName}</div>
       <div class="lock-desc">${featureDesc}</div>
       <div class="lock-actions">
-        <button class="lock-btn" id="ls-${paneId}">Sign In</button>
-        <button class="lock-btn-ghost" id="lsu-${paneId}">Create Free Account</button>
-      </div>
-    `;
-    overlay.querySelector('#ls-' + paneId).addEventListener('click', () => { window.location.href = 'signin.html'; });
-    overlay.querySelector('#lsu-' + paneId).addEventListener('click', () => { window.location.href = 'signup.html'; });
+        <button class="lock-btn" onclick="location.href='signin.html'">Sign In</button>
+        <button class="lock-btn-ghost" onclick="location.href='signup.html'">Create Free Account</button>
+      </div>`;
     pane.appendChild(overlay);
   }
 
-  gateContent('pane-predictions', 'AI Predictions', 'Sign in to access ML-powered 5-day price forecasts with confidence scoring for NEPSE stocks.');
-  gateContent('pane-portfolio', 'Portfolio Tracker', 'Sign in to track your holdings, monitor P&L, and analyze your sector allocation in real-time.');
+  gateContent('pane-predictions', 'AI Predictions',   'Sign in to access ML-powered 5-day price forecasts with confidence scoring for NEPSE stocks.');
+  gateContent('pane-portfolio',   'Portfolio Tracker', 'Sign in to track your holdings, monitor P&L, and analyze your sector allocation in real-time.');
 }
 
 initAuth();
